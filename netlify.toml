@@ -5,13 +5,13 @@
 
 [[redirects]]
   from = "/api/*"
-  to = "http://203.161.57.212/api/:splat"
+  to = "https://api.kalyan36bazar.online/api/:splat"
   status = 200
   force = true
 
 [[redirects]]
   from = "/auth/*"
-  to = "http://203.161.57.212/auth/:splat"
+  to = "https://api.kalyan36bazar.online/auth/:splat"
   status = 200
   force = true
 
