@@ -40,7 +40,7 @@ export default function Landing() {
   // Dynamic SEO Metadata Injection & JSON-LD Structured Data Schema
   useEffect(() => {
     // 1. Dynamic Title Tag
-    document.title = "Milan 36 Bazar | Fast Live Satta Matka Results, Kalyan Matka App";
+    document.title = "Kalyan 36 Bazar | Fast Live Satta Matka Results, Kalyan Matka App";
 
     // 2. Dynamic Meta Description Tag
     let metaDescription = document.querySelector('meta[name="description"]');
@@ -51,7 +51,7 @@ export default function Landing() {
     }
     metaDescription.setAttribute(
       'content',
-      "Get the fastest live Satta Matka results for Kalyan Matka, Milan Day, Rajdhani Night, and Main Bazar. Download the official Milan 36 Bazar Android app today for secure Matka gaming and instant withdrawals."
+      "Get the fastest live Satta Matka results for Kalyan Matka, Kalyan Day, Rajdhani Night, and Main Bazar. Download the official Kalyan 36 Bazar Android app today for secure Matka gaming and instant withdrawals."
     );
 
     // 3. Dynamic Meta Keywords Tag
@@ -63,7 +63,7 @@ export default function Landing() {
     }
     metaKeywords.setAttribute(
       'content',
-      "milan 35 bazar, milan 36 bazar, satta matka, kalyan matka, kalyan 36 bazar, satta matka results, milan day results, rajdhani night results, kalyan open close, download milan matka apk"
+      "kalyan 35 bazar, kalyan 36 bazar, satta matka, kalyan matka, kalyan 36 bazar, satta matka results, kalyan day results, rajdhani night results, kalyan open close, download kalyan matka apk"
     );
 
     // 4. Dynamic Canonical Link Tag
@@ -76,7 +76,7 @@ export default function Landing() {
     canonical.setAttribute('href', window.location.origin);
 
     // 5. Software Application JSON-LD Schema (Google Rich Results snippet optimization)
-    const schemaId = "milan36-ld-json";
+    const schemaId = "kalyan36-ld-json";
     let schemaScript = document.getElementById(schemaId);
     if (!schemaScript) {
       schemaScript = document.createElement('script');
@@ -88,10 +88,10 @@ export default function Landing() {
     const schemaData = {
       "@context": "https://schema.org",
       "@type": "SoftwareApplication",
-      "name": "Milan 36 Bazar App",
+      "name": "Kalyan 36 Bazar App",
       "operatingSystem": "Android",
       "applicationCategory": "GameApplication",
-      "downloadUrl": "https://github.com/shravani-agro/milan36bazar_frontend/releases/latest/download/milan36bazaar.apk",
+      "downloadUrl": "https://github.com/shravani-agro/kalyan36bazar_frontend/releases/latest/download/kalyan36bazar.apk",
       "offers": {
         "@type": "Offer",
         "price": "0.00",
@@ -102,10 +102,10 @@ export default function Landing() {
         "ratingValue": "4.9",
         "ratingCount": "14285"
       },
-      "description": "Securely bid and check lightning-fast Satta Matka results for Kalyan Matka, Milan Day, and Main Bazar directly on your Android device.",
+      "description": "Securely bid and check lightning-fast Satta Matka results for Kalyan Matka, Kalyan Day, and Main Bazar directly on your Android device.",
       "author": {
         "@type": "Organization",
-        "name": "Milan 36 Bazar"
+        "name": "Kalyan 36 Bazar"
       }
     };
     schemaScript.innerHTML = JSON.stringify(schemaData);
@@ -275,7 +275,7 @@ export default function Landing() {
               </div>
               <div className="min-w-0">
                 <span className="block text-sm xs:text-base sm:text-lg font-black tracking-wider bg-gradient-to-r from-amber-400 via-yellow-300 to-white bg-clip-text text-transparent truncate">
-                  MILAN 36 BAZAR
+                  KALYAN 36 BAZAR
                 </span>
                 <span className="hidden xs:block text-[9px] font-bold tracking-widest text-amber-500/80 uppercase">
                   Trusted Results & Gaming
@@ -294,7 +294,7 @@ export default function Landing() {
             {/* Quick Actions */}
             <div className="flex items-center gap-2 sm:gap-3">
               <a
-                href="https://github.com/shravani-agro/milan36bazar_frontend/releases/latest/download/milan36bazaar.apk"
+                href="https://github.com/shravani-agro/kalyan36bazar_frontend/releases/latest/download/kalyan36bazar.apk"
                 download
                 className="inline-flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-5 py-1.5 sm:py-2.5 rounded-lg bg-gradient-to-r from-amber-500 to-yellow-400 hover:from-amber-600 hover:to-yellow-500 text-slate-950 font-bold shadow-lg shadow-amber-500/10 hover:shadow-amber-500/25 transition-all duration-300 text-xs sm:text-sm active:scale-95"
               >
@@ -372,7 +372,7 @@ export default function Landing() {
               </h1>
 
               <p className="text-base sm:text-lg text-slate-400 max-w-xl mx-auto lg:mx-0">
-                Get ultra-fast declared results, high win multipliers up to 900x, and secure digital transaction infrastructure directly on your Android phone. Play Kalyan, Milan, Main Bazar, and more securely!
+                Get ultra-fast declared results, high win multipliers up to 900x, and secure digital transaction infrastructure directly on your Android phone. Play Kalyan, Kalyan, Main Bazar, and more securely!
               </p>
 
               {/* Badges Row - Optimized for small device responsiveness */}
@@ -400,7 +400,7 @@ export default function Landing() {
               {/* Primary Action Buttons */}
               <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4">
                 <a
-                  href="https://github.com/shravani-agro/milan36bazar_frontend/releases/latest/download/milan36bazaar.apk"
+                  href="https://github.com/shravani-agro/kalyan36bazar_frontend/releases/latest/download/kalyan36bazar.apk"
                   download
                   className="w-full sm:w-auto inline-flex items-center justify-center gap-3 px-8 py-4 rounded-xl bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-500 hover:from-amber-600 hover:to-yellow-500 text-slate-950 font-extrabold text-base shadow-xl shadow-amber-500/10 hover:shadow-amber-500/30 hover:scale-[1.02] active:scale-95 transition-all duration-300"
                 >
@@ -460,7 +460,7 @@ export default function Landing() {
                   <div className="flex items-center justify-between bg-gradient-to-r from-amber-500 via-amber-600 to-amber-500 px-4 py-3 shadow-md">
                     <div className="flex items-center gap-2">
                       <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-slate-950 text-amber-400 font-bold text-sm shadow-inner">M</div>
-                      <span className="text-xs font-black tracking-wide text-slate-950">MILAN 36 BAZAR</span>
+                      <span className="text-xs font-black tracking-wide text-slate-950">KALYAN 36 BAZAR</span>
                     </div>
                     <div className="flex items-center gap-1 bg-slate-950/20 px-2 py-0.5 rounded-full text-[9px] font-bold text-slate-950">
                       <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> App Online
@@ -710,7 +710,7 @@ export default function Landing() {
 
                     {/* Action inside card */}
                     <a
-                      href="https://github.com/shravani-agro/milan36bazar_frontend/releases/latest/download/milan36bazaar.apk"
+                      href="https://github.com/shravani-agro/kalyan36bazar_frontend/releases/latest/download/kalyan36bazar.apk"
                       download
                       className="w-full mt-4 py-2 px-4 rounded-xl border border-slate-800 bg-slate-950 text-slate-400 text-xs font-bold flex items-center justify-center gap-2 group-hover:bg-amber-500 group-hover:text-slate-950 group-hover:border-transparent transition-all duration-300 active:scale-98"
                     >
@@ -732,7 +732,7 @@ export default function Landing() {
               Premium Features
             </div>
             <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight">
-              Why Choose Milan 36 Bazar App?
+              Why Choose Kalyan 36 Bazar App?
             </h2>
             <p className="text-slate-400 text-sm sm:text-base">
               We provide a premium, modern, secure digital platform designed to offer the absolute best gaming experience.
@@ -871,7 +871,7 @@ export default function Landing() {
               Frequently Answered Questions
             </h2>
             <p className="text-slate-400 text-sm sm:text-base">
-              Everything you need to know about the Milan 36 Bazar application, gaming system, and payout security.
+              Everything you need to know about the Kalyan 36 Bazar application, gaming system, and payout security.
             </p>
           </div>
 
@@ -879,11 +879,11 @@ export default function Landing() {
           <div className="space-y-4">
             {[
               {
-                q: "How do I download the Milan 36 Bazar app?",
-                a: "Simply click the 'Download Android APK' button anywhere on our landing page. This will immediately download our official secure app binary package (milan36bazaar.apk) directly. Ensure your browser is allowed to install applications from 'unknown sources' in your device settings."
+                q: "How do I download the Kalyan 36 Bazar app?",
+                a: "Simply click the 'Download Android APK' button anywhere on our landing page. This will immediately download our official secure app binary package (kalyan36bazar.apk) directly. Ensure your browser is allowed to install applications from 'unknown sources' in your device settings."
               },
               {
-                q: "Is playing on Milan 36 Bazar safe?",
+                q: "Is playing on Kalyan 36 Bazar safe?",
                 a: "Absolutely. Our app integrates robust military-grade data encryption, protecting your profile, transaction logs, and credentials from unauthorized exposure. You have complete control over your private deposits and withdrawal endpoints."
               },
               {
@@ -943,13 +943,13 @@ export default function Landing() {
                 Ready to Win? Download the Official App Now!
               </h3>
               <p className="text-white/80 text-xs sm:text-sm leading-relaxed">
-                Join millions of players on Milan 36 Bazar. Get instant results, ultra-fast 2-minute payouts, and 24/7 hot WhatsApp support. Secure your download today!
+                Join millions of players on Kalyan 36 Bazar. Get instant results, ultra-fast 2-minute payouts, and 24/7 hot WhatsApp support. Secure your download today!
               </p>
             </div>
 
             <div className="flex flex-col sm:flex-row gap-4 items-center shrink-0 w-full md:w-auto relative z-10">
               <a
-                href="https://github.com/shravani-agro/milan36bazar_frontend/releases/latest/download/milan36bazaar.apk"
+                href="https://github.com/shravani-agro/kalyan36bazar_frontend/releases/latest/download/kalyan36bazar.apk"
                 download
                 className="w-full sm:w-auto inline-flex items-center justify-center gap-3 px-8 py-4 rounded-xl bg-slate-950 hover:bg-slate-900 text-white font-extrabold text-base shadow-xl transition-all duration-300 border border-slate-800 hover:border-amber-500/60 active:scale-95"
               >
@@ -973,11 +973,11 @@ export default function Landing() {
                   M
                 </div>
                 <span className="text-sm font-black tracking-wider text-white">
-                  MILAN 36 BAZAR
+                  KALYAN 36 BAZAR
                 </span>
               </div>
               <p className="leading-relaxed text-slate-400 max-w-sm">
-                Milan 36 Bazar is India's leading secure digital results dashboard and gaming platform. Built to offer military-grade transactional security and lighting payout speed.
+                Kalyan 36 Bazar is India's leading secure digital results dashboard and gaming platform. Built to offer military-grade transactional security and lighting payout speed.
               </p>
 
               {/* Disclaimer */}
@@ -1015,7 +1015,7 @@ export default function Landing() {
                   </Link>
                 </li>
                 <li>
-                  <a href="https://github.com/shravani-agro/milan36bazar_frontend/releases/latest/download/milan36bazaar.apk" download className="hover:text-amber-400 transition-colors flex items-center gap-1.5">
+                  <a href="https://github.com/shravani-agro/kalyan36bazar_frontend/releases/latest/download/kalyan36bazar.apk" download className="hover:text-amber-400 transition-colors flex items-center gap-1.5">
                     <Download className="h-3 w-3" />
                     <span>Download App APK</span>
                   </a>
@@ -1027,7 +1027,7 @@ export default function Landing() {
 
           {/* Bottom Copyright line - perfectly wrapped and spaced for mobile viewports */}
           <div className="border-t border-slate-900/60 pt-8 flex flex-col sm:flex-row justify-between items-center gap-6 sm:gap-4 text-center sm:text-left">
-            <p className="order-2 sm:order-1 text-slate-600">&copy; {new Date().getFullYear()} Milan 36 Bazar. All rights reserved. Serviced via Netlify.</p>
+            <p className="order-2 sm:order-1 text-slate-600">&copy; {new Date().getFullYear()} Kalyan 36 Bazar. All rights reserved. Serviced via Netlify.</p>
             <div className="order-1 sm:order-2 flex flex-wrap justify-center gap-x-4 sm:gap-x-6 gap-y-2">
               <a href="#" className="hover:text-slate-300">Privacy Policy</a>
               <a href="#" className="hover:text-slate-300">Terms of Play</a>

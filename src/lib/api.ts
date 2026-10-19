@@ -124,9 +124,9 @@ export const realApi = {
     },
     testNotification: async (token?: string) => {
       try {
-        const res = await api.post("/api/test-notification", { 
-          title: "Test Notification", 
-          body: "This is a test notification from Milan 36 Bazar Admin console.",
+        const res = await api.post("/api/test-notification", {
+          title: "Test Notification",
+          body: "This is a test notification from Kalyan 36 Bazar Admin console.",
           token: token
         });
         return { data: res.data, error: null };

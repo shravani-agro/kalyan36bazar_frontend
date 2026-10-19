@@ -395,7 +395,7 @@ function AuthScreen({ isSubAdminPortal }: { isSubAdminPortal: boolean }) {
             <Lock className="h-6 w-6" />
           </div>
           <div>
-            <h1 className="text-2xl font-semibold">{isSubAdminPortal ? "Milan 36 Bazar Sub-Admin" : "Milan 36 Bazar Admin"}</h1>
+            <h1 className="text-2xl font-semibold">{isSubAdminPortal ? "Kalyan 36 Bazar Sub-Admin" : "Kalyan 36 Bazar Admin"}</h1>
             <p className="text-sm text-muted-foreground">{isSubAdminPortal ? "Sub-admin access portal" : "Secure gaming operations console"}</p>
           </div>
         </div>
@@ -407,7 +407,7 @@ function AuthScreen({ isSubAdminPortal }: { isSubAdminPortal: boolean }) {
             className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary hover:bg-primary/20 transition-colors text-sm font-medium"
           >
             <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
-            Download Milan 36 Bazar App
+            Download Kalyan 36 Bazar App
           </a>
         </div>
       </section>

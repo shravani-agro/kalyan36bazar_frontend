@@ -18,7 +18,7 @@ export function Sidebar({
       <div className="flex h-16 items-center justify-between border-b border-border px-4">
         <div className="flex items-center gap-3 overflow-hidden">
           <div className="grid h-10 w-10 shrink-0 place-items-center rounded-md bg-primary text-primary-foreground"><Crown className="h-5 w-5" /></div>
-          {sidebarOpen && <div><p className="font-semibold">milan36bazar</p><p className="text-xs text-muted-foreground">Admin</p></div>}
+          {sidebarOpen && <div><p className="font-semibold">kalyan36bazar</p><p className="text-xs text-muted-foreground">Admin</p></div>}
         </div>
         <button className="icon-button hidden lg:grid" onClick={() => setSidebarOpen(!sidebarOpen)}>
           {sidebarOpen ? <ChevronLeft /> : <ChevronRight />}

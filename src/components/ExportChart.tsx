@@ -133,7 +133,7 @@ function ChartExportTemplate({
             <h2 style={{ fontSize: "16px", fontWeight: "bold", margin: "8px 0 0 0", textAlign: "left" }}>दिनांक : {currentExportDateDisplay}</h2>
           </div>
           <div style={{ width: "65%", display: "flex", alignItems: "center", justifyContent: "center", boxSizing: "border-box" }}>
-            <h1 style={{ fontSize: "48px", fontWeight: "900", margin: "0", letterSpacing: "2px", lineHeight: "1", paddingBottom: "10px" }}>MILAN 36 BAZAR</h1>
+            <h1 style={{ fontSize: "48px", fontWeight: "900", margin: "0", letterSpacing: "2px", lineHeight: "1", paddingBottom: "10px" }}>KALYAN 36 BAZAR</h1>
           </div>
         </div>
 
@@ -243,7 +243,7 @@ export const downloadChartPDF = async (
 
       // A4 landscape is 297 x 210 mm
       pdf.addImage(imgData, "JPEG", 0, 0, 297, 210);
-      pdf.save("milan36-panel-chart.pdf");
+      pdf.save("kalyan36-panel-chart.pdf");
     } catch (err) {
       console.error("Failed to generate PDF", err);
     } finally {

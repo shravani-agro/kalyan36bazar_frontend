@@ -115,7 +115,7 @@ export type ActivityLog = {
 export type Session = { user: { id: string; email: string } } | null;
 
 
-const STORAGE_KEY = "milan36bazar_admin_data";
+const STORAGE_KEY = "kalyan36bazar_admin_data";
 
 interface StorageData {
   app_users: AppUser[];
