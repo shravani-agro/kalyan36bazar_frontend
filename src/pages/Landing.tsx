@@ -271,7 +271,7 @@ export default function Landing() {
             {/* Logo */}
             <div className="flex items-center gap-1.5 sm:gap-2">
               <div className="flex h-9 w-9 sm:h-10 sm:w-10 shrink-0 items-center justify-center rounded-lg sm:rounded-xl bg-gradient-to-tr from-amber-500 to-yellow-400 text-slate-950 font-black text-lg shadow-lg shadow-amber-500/20">
-                M
+                K
               </div>
               <div className="min-w-0">
                 <span className="block text-sm xs:text-base sm:text-lg font-black tracking-wider bg-gradient-to-r from-amber-400 via-yellow-300 to-white bg-clip-text text-transparent truncate">
@@ -459,7 +459,7 @@ export default function Landing() {
                   {/* Inside App Header */}
                   <div className="flex items-center justify-between bg-gradient-to-r from-amber-500 via-amber-600 to-amber-500 px-4 py-3 shadow-md">
                     <div className="flex items-center gap-2">
-                      <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-slate-950 text-amber-400 font-bold text-sm shadow-inner">M</div>
+                      <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-slate-950 text-amber-400 font-bold text-sm shadow-inner">K</div>
                       <span className="text-xs font-black tracking-wide text-slate-950">KALYAN 36 BAZAR</span>
                     </div>
                     <div className="flex items-center gap-1 bg-slate-950/20 px-2 py-0.5 rounded-full text-[9px] font-bold text-slate-950">
@@ -970,7 +970,7 @@ export default function Landing() {
             <div className="space-y-4 md:col-span-2">
               <div className="flex items-center gap-2">
                 <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-tr from-amber-500 to-yellow-400 text-slate-950 font-black text-lg shadow">
-                  M
+                  K
                 </div>
                 <span className="text-sm font-black tracking-wider text-white">
                   KALYAN 36 BAZAR
