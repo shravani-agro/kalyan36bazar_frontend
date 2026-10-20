@@ -273,6 +273,7 @@ export function PermissionSelect({ item }: { item?: any }) {
     show_commission: item?.show_commission ?? true,
     show_bid_data: item?.show_bid_data ?? true,
     show_result: item?.show_result ?? true,
+    show_agent_report: item?.show_agent_report ?? true,
   });
 
   const toggle = (key: string) => {
@@ -286,6 +287,7 @@ export function PermissionSelect({ item }: { item?: any }) {
     show_commission: "Show Commission",
     show_bid_data: "Show Bid Data",
     show_result: "Show Results Section",
+    show_agent_report: "Show Agent Report (एजंट रिपोर्ट)",
   };
 
   return (

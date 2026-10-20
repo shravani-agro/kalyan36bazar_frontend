@@ -113,7 +113,7 @@ function App({ isSubAdminPortal = false }: { isSubAdminPortal?: boolean }) {
       return navItems.filter(item => {
         if (item.id === "overview") return true;
         if (item.id === "users") return true; // My Users
-        if (item.id === "agent_report") return true; // Agent Report
+        if (item.id === "agent_report") return user.show_agent_report !== false; // Agent Report
         if (item.id === "commission") return user.show_commission !== false;
         if (item.id === "results") return user.show_result !== false;
         if (item.id === "records") return user.show_bid_data !== false;

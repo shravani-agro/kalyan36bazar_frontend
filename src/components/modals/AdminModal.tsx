@@ -82,6 +82,7 @@ export function AdminModal({ modal, users, markets, results, onClose, onSaved }:
                   show_commission: form.get("show_commission_hidden") === "true",
                   show_bid_data: form.get("show_bid_data_hidden") === "true",
                   show_result: form.get("show_result_hidden") === "true",
+                  show_agent_report: form.get("show_agent_report_hidden") === "true",
                 },
                 modal.item?.id
               )

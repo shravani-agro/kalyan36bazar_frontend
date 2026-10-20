@@ -91,7 +91,7 @@ export function AgentReportModule({
     const isNeg = balance < 0;
     const absBal = Math.abs(balance);
 
-    const statusTitle = isPos ? "जमा" : isNeg ? "नावे (देणे)" : "शून्य";
+    const statusTitle = isPos ? "जमा" : isNeg ? "नावे" : "शून्य";
     const balanceDisplay = isNeg
       ? `-₹${absBal.toLocaleString("en-IN")}`
       : `₹${absBal.toLocaleString("en-IN")}`;
@@ -99,7 +99,7 @@ export function AgentReportModule({
     const actionMsg = isPos
       ? `एजंटकडून कंपनीला ₹${absBal.toLocaleString("en-IN")} जमा करायचे आहेत.`
       : isNeg
-        ? `कंपनीकडून एजंटला ₹${absBal.toLocaleString("en-IN")} द्यायचे आहेत.`
+        ? `कंपनीकडून एजंटला ₹${absBal.toLocaleString("en-IN")} नावे करायचे आहेत.`
         : `दोन्ही बाजूंचा हिशोब पूर्णपणे जुळला आहे.`;
 
     return `कल्याण 36 बाजार
@@ -206,12 +206,12 @@ ${actionMsg}
   const isPositive = finalBalance > 0;
   const isNegative = finalBalance < 0;
   const absBalance = Math.abs(finalBalance);
-  const statusBadgeText = isPositive ? "जमा (+)" : isNegative ? "देणे (−)" : "शून्य (0)";
+  const statusBadgeText = isPositive ? "जमा (+)" : isNegative ? "नावे (−)" : "शून्य (0)";
 
   const statusActionMessage = isPositive
     ? `एजंटकडून कंपनीला ₹${absBalance.toLocaleString("en-IN")} जमा करायचे आहेत.`
     : isNegative
-      ? `कंपनीकडून एजंटला ₹${absBalance.toLocaleString("en-IN")} द्यायचे आहेत.`
+      ? `कंपनीकडून एजंटला ₹${absBalance.toLocaleString("en-IN")} नावे करायचे आहेत.`
       : `दोन्ही बाजूंचा हिशोब पूर्णपणे जुळला आहे.`;
 
   // Formatted settlement text for clipboard copy
@@ -328,9 +328,8 @@ ${actionMsg}
 
         </div>
       </div>
-    </div>
 
-      {/* 4 Metrics Summary Cards */ }
+      {/* 4 Metrics Summary Cards */}
   <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
     {/* Total Business */}
     <div className="rounded-xl border border-border bg-card p-4 shadow-sm">
@@ -536,7 +535,7 @@ ${actionMsg}
                       : "bg-muted text-muted-foreground"
                     }`}
                 >
-                  {stat.isPositive ? "जमा (+)" : stat.isNegative ? "देणे (−)" : "शून्य"}
+                  {stat.isPositive ? "जमा (+)" : stat.isNegative ? "नावे (−)" : "शून्य"}
                 </span>
               </td>
               <td>
@@ -584,7 +583,7 @@ ${actionMsg}
               const totBal = allUsersReport.reduce((s, u) => s + u.balance, 0);
               return (
                 <span className={`inline-flex rounded-full px-2.5 py-0.5 text-xs font-bold ${totBal > 0 ? "bg-emerald-500/10 text-emerald-600" : totBal < 0 ? "bg-rose-500/10 text-rose-600" : "bg-muted text-muted-foreground"}`}>
-                  {totBal > 0 ? "जमा (+)" : totBal < 0 ? "देणे (−)" : "शून्य"}
+                  {totBal > 0 ? "जमा (+)" : totBal < 0 ? "नावे (−)" : "शून्य"}
                 </span>
               );
             })()}
