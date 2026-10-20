@@ -1,15 +1,15 @@
 import { useState, useMemo } from "react";
 import { AppUser, Bid, WinHistory } from "@/lib/mockApi";
 import { Panel, DataTable, money, getToday } from "../ui/AdminUI";
-import { 
-  ReceiptText, 
-  Copy, 
-  Check, 
-  Calculator, 
-  Briefcase, 
-  Wallet, 
-  Percent, 
-  Trophy, 
+import {
+  ReceiptText,
+  Copy,
+  Check,
+  Calculator,
+  Briefcase,
+  Wallet,
+  Percent,
+  Trophy,
   Info,
   Calendar,
   UserCheck,
@@ -71,7 +71,7 @@ export function AgentReportModule({
       if (parts.length === 3) {
         return `${parts[2]}-${parts[1]}-${parts[0]}`;
       }
-    } catch (_) {}
+    } catch (_) { }
     return d;
   };
 
@@ -99,8 +99,8 @@ export function AgentReportModule({
     const actionMsg = isPos
       ? `एजंटकडून कंपनीला ₹${absBal.toLocaleString("en-IN")} जमा करायचे आहेत.`
       : isNeg
-      ? `कंपनीकडून एजंटला ₹${absBal.toLocaleString("en-IN")} द्यायचे आहेत.`
-      : `दोन्ही बाजूंचा हिशोब पूर्णपणे जुळला आहे.`;
+        ? `कंपनीकडून एजंटला ₹${absBal.toLocaleString("en-IN")} द्यायचे आहेत.`
+        : `दोन्ही बाजूंचा हिशोब पूर्णपणे जुळला आहे.`;
 
     return `कल्याण 36 बाजार
 
@@ -211,8 +211,8 @@ ${actionMsg}
   const statusActionMessage = isPositive
     ? `एजंटकडून कंपनीला ₹${absBalance.toLocaleString("en-IN")} जमा करायचे आहेत.`
     : isNegative
-    ? `कंपनीकडून एजंटला ₹${absBalance.toLocaleString("en-IN")} द्यायचे आहेत.`
-    : `दोन्ही बाजूंचा हिशोब पूर्णपणे जुळला आहे.`;
+      ? `कंपनीकडून एजंटला ₹${absBalance.toLocaleString("en-IN")} द्यायचे आहेत.`
+      : `दोन्ही बाजूंचा हिशोब पूर्णपणे जुळला आहे.`;
 
   // Formatted settlement text for clipboard copy
   const activeSettlementMessage = useMemo(() => {
@@ -325,341 +325,301 @@ ${actionMsg}
             </div>
           </div>
 
-          <div className="flex items-end">
-            <button
-              onClick={() => {
-                toast.success("हिशोब अपडेट केला! (Settlement Calculated)");
-              }}
-              className="inline-flex w-full items-center justify-center gap-2 rounded-md bg-secondary px-4 py-2 text-sm font-bold text-secondary-foreground shadow transition hover:bg-secondary/80"
-            >
-              <Calculator className="h-4 w-4" />
-              Get Now / हिशोब काढा
-            </button>
-          </div>
+
         </div>
       </div>
+    </div>
 
-      {/* 4 Metrics Summary Cards */}
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        {/* Total Business */}
-        <div className="rounded-xl border border-border bg-card p-4 shadow-sm">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Total Business</span>
-            <div className="grid h-8 w-8 place-items-center rounded-lg bg-blue-500/10 text-blue-600">
-              <Briefcase className="h-4 w-4" />
-            </div>
-          </div>
-          <p className="mt-1 text-xs text-muted-foreground">एकूण धंदा</p>
-          <p className="mt-2 text-2xl font-black text-foreground">
-            {money.format(totalCollection)}
-          </p>
-          <p className="mt-1 text-xs text-muted-foreground">{agentDisplayName}</p>
-        </div>
-
-        {/* Total Collection */}
-        <div className="rounded-xl border border-border bg-card p-4 shadow-sm">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Total Collection</span>
-            <div className="grid h-8 w-8 place-items-center rounded-lg bg-emerald-500/10 text-emerald-600">
-              <Wallet className="h-4 w-4" />
-            </div>
-          </div>
-          <p className="mt-1 text-xs text-muted-foreground">एकूण कलेक्शन</p>
-          <p className="mt-2 text-2xl font-black text-emerald-600">
-            {money.format(totalCollection)}
-          </p>
-          <p className="mt-1 text-xs text-muted-foreground">100% बिड अमाऊंट</p>
-        </div>
-
-        {/* Total Commission */}
-        <div className="rounded-xl border border-border bg-card p-4 shadow-sm">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Total Commission</span>
-            <div className="grid h-8 w-8 place-items-center rounded-lg bg-amber-500/10 text-amber-600">
-              <Percent className="h-4 w-4" />
-            </div>
-          </div>
-          <p className="mt-1 text-xs text-muted-foreground">एकूण कमिशन ({effectiveCommissionRate}%)</p>
-          <p className="mt-2 text-2xl font-black text-amber-600">
-            {money.format(totalCommission)}
-          </p>
-          <p className="mt-1 text-xs text-muted-foreground">कमिशन कपात</p>
-        </div>
-
-        {/* Total Win Amount */}
-        <div className="rounded-xl border border-border bg-card p-4 shadow-sm">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Total Win Amount</span>
-            <div className="grid h-8 w-8 place-items-center rounded-lg bg-purple-500/10 text-purple-600">
-              <Trophy className="h-4 w-4" />
-            </div>
-          </div>
-          <p className="mt-1 text-xs text-muted-foreground">विन अमाऊंट</p>
-          <p className="mt-2 text-2xl font-black text-purple-600">
-            {money.format(totalWinAmount)}
-          </p>
-          <p className="mt-1 text-xs text-muted-foreground">एकूण विनर्स</p>
+      {/* 4 Metrics Summary Cards */ }
+  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+    {/* Total Business */}
+    <div className="rounded-xl border border-border bg-card p-4 shadow-sm">
+      <div className="flex items-center justify-between">
+        <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Total Business</span>
+        <div className="grid h-8 w-8 place-items-center rounded-lg bg-blue-500/10 text-blue-600">
+          <Briefcase className="h-4 w-4" />
         </div>
       </div>
+      <p className="mt-1 text-xs text-muted-foreground">एकूण धंदा</p>
+      <p className="mt-2 text-2xl font-black text-foreground">
+        {money.format(totalCollection)}
+      </p>
+      <p className="mt-1 text-xs text-muted-foreground">{agentDisplayName}</p>
+    </div>
 
-      {/* Hero Settlement Card */}
-      <div 
-        className={`rounded-2xl border p-6 text-card-foreground shadow-md transition-all ${
-          isPositive 
-            ? "border-emerald-500/30 bg-gradient-to-br from-emerald-500/10 via-background to-emerald-500/5" 
-            : isNegative 
-            ? "border-rose-500/30 bg-gradient-to-br from-rose-500/10 via-background to-rose-500/5" 
-            : "border-border bg-card"
-        }`}
-      >
-        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-          <div>
-            <div className="flex items-center gap-2">
-              <span className="text-xs font-extrabold uppercase tracking-widest text-muted-foreground">
-                Final Settlement Formula / अंतिम सेटलमेंट
-              </span>
-              <span
-                className={`inline-flex items-center rounded-full px-3 py-0.5 text-xs font-extrabold shadow-sm ${
-                  isPositive
-                    ? "bg-emerald-600 text-white"
-                    : isNegative
-                    ? "bg-rose-600 text-white"
-                    : "bg-muted text-muted-foreground"
-                }`}
-              >
-                स्थिती: {statusBadgeText}
-              </span>
-            </div>
-
-            <div className="mt-2 flex items-baseline gap-3">
-              <span className="text-sm font-semibold text-muted-foreground">Final Balance:</span>
-              <span
-                className={`text-3xl font-black md:text-4xl ${
-                  isPositive 
-                    ? "text-emerald-600 dark:text-emerald-400" 
-                    : isNegative 
-                    ? "text-rose-600 dark:text-rose-400" 
-                    : "text-foreground"
-                }`}
-              >
-                {isPositive ? `+₹${absBalance.toLocaleString("en-IN")}` : isNegative ? `-₹${absBalance.toLocaleString("en-IN")}` : `₹0`}
-              </span>
-            </div>
-
-            <p className="mt-2 text-sm font-bold text-foreground">
-              👉 {statusActionMessage}
-            </p>
-          </div>
-
-          {/* Formula calculation badge with quick copy */}
-          <div className="flex flex-col items-end gap-2">
-            <div className="rounded-xl border border-border/80 bg-background/80 p-3 text-xs backdrop-blur-sm">
-              <p className="font-bold text-muted-foreground">हिशोब सूत्र (Calculation):</p>
-              <p className="mt-1 font-mono font-semibold">
-                कलेक्शन ({money.format(totalCollection)})
-                <br />− कमिशन ({money.format(totalCommission)})
-                <br />− विन अमाऊंट ({money.format(totalWinAmount)})
-                <br />
-                <span className="font-bold underline underline-offset-2">
-                  = {isPositive ? `+₹${absBalance.toLocaleString("en-IN")}` : isNegative ? `-₹${absBalance.toLocaleString("en-IN")}` : `₹0`}
-                </span>
-              </p>
-            </div>
-            <button
-              onClick={() => copyToClipboard(activeSettlementMessage, "hero")}
-              className="inline-flex items-center gap-1.5 rounded-md border border-border bg-background px-3 py-1.5 text-xs font-bold shadow-sm transition hover:bg-muted"
-            >
-              {copiedId === "hero" ? <Check className="h-3.5 w-3.5 text-green-600" /> : <Copy className="h-3.5 w-3.5 text-primary" />}
-              {copiedId === "hero" ? "Copied!" : "Copy Report"}
-            </button>
-          </div>
+    {/* Total Collection */}
+    <div className="rounded-xl border border-border bg-card p-4 shadow-sm">
+      <div className="flex items-center justify-between">
+        <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Total Collection</span>
+        <div className="grid h-8 w-8 place-items-center rounded-lg bg-emerald-500/10 text-emerald-600">
+          <Wallet className="h-4 w-4" />
         </div>
       </div>
+      <p className="mt-1 text-xs text-muted-foreground">एकूण कलेक्शन</p>
+      <p className="mt-2 text-2xl font-black text-emerald-600">
+        {money.format(totalCollection)}
+      </p>
+      <p className="mt-1 text-xs text-muted-foreground">100% बिड अमाऊंट</p>
+    </div>
 
-      {/* Rules & Marathi Disclaimer Box */}
-      <div className="rounded-xl border border-border bg-card p-5 shadow-sm">
-        <div className="flex items-start gap-3">
-          <div className="mt-0.5 grid h-7 w-7 shrink-0 place-items-center rounded-full bg-blue-500/10 text-blue-600">
-            <Info className="h-4 w-4" />
-          </div>
-          <div className="space-y-3 text-sm">
-            <p className="font-medium text-muted-foreground">
-              वरील आकडे केवळ उदाहरणासाठी आहेत. प्रत्यक्ष हिशोब तुमच्या ॲपमधील नोंदींवर आधारित असावा.
-            </p>
-
-            <div className="rounded-lg bg-muted/40 p-3">
-              <h4 className="font-bold text-foreground">Plus / Minus चे नियम:</h4>
-              <ul className="mt-1.5 space-y-1 text-xs font-semibold text-muted-foreground">
-                <li className="flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400">
-                  <span className="font-bold">✔ जमा (+):</span> एजंटकडून कंपनीला जमा करायची रक्कम.
-                </li>
-                <li className="flex items-center gap-1.5 text-rose-600 dark:text-rose-400">
-                  <span className="font-bold">✖ देणे (−):</span> कंपनीकडून एजंटला द्यायची रक्कम.
-                </li>
-                <li className="flex items-center gap-1.5 text-foreground">
-                  <span className="font-bold">● शून्य (0):</span> दोन्ही बाजूंचा हिशोब पूर्णपणे जुळला आहे.
-                </li>
-              </ul>
-            </div>
-          </div>
+    {/* Total Commission */}
+    <div className="rounded-xl border border-border bg-card p-4 shadow-sm">
+      <div className="flex items-center justify-between">
+        <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Total Commission</span>
+        <div className="grid h-8 w-8 place-items-center rounded-lg bg-amber-500/10 text-amber-600">
+          <Percent className="h-4 w-4" />
         </div>
       </div>
+      <p className="mt-1 text-xs text-muted-foreground">एकूण कमिशन ({effectiveCommissionRate}%)</p>
+      <p className="mt-2 text-2xl font-black text-amber-600">
+        {money.format(totalCommission)}
+      </p>
+      <p className="mt-1 text-xs text-muted-foreground">कमिशन कपात</p>
+    </div>
 
-      {/* All Users Agent Settlement Table (Admin Panel Only feature to see ALL users) */}
-      <Panel
-        title={`सर्व युझर्स एजंट सेटलमेंट यादी (${allUsersReport.length} Users · ${periodLabel})`}
-        action={
-          <button
-            onClick={() => copyToClipboard(activeSettlementMessage, "all_users_copy")}
-            className="inline-flex items-center gap-1.5 rounded-md bg-primary px-3 py-1.5 text-xs font-bold text-primary-foreground shadow transition hover:opacity-95"
+    {/* Total Win Amount */}
+    <div className="rounded-xl border border-border bg-card p-4 shadow-sm">
+      <div className="flex items-center justify-between">
+        <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Total Win Amount</span>
+        <div className="grid h-8 w-8 place-items-center rounded-lg bg-purple-500/10 text-purple-600">
+          <Trophy className="h-4 w-4" />
+        </div>
+      </div>
+      <p className="mt-1 text-xs text-muted-foreground">विन अमाऊंट</p>
+      <p className="mt-2 text-2xl font-black text-purple-600">
+        {money.format(totalWinAmount)}
+      </p>
+      <p className="mt-1 text-xs text-muted-foreground">एकूण विनर्स</p>
+    </div>
+  </div>
+
+  {/* Hero Settlement Card */ }
+  <div
+    className={`rounded-2xl border p-6 text-card-foreground shadow-md transition-all ${isPositive
+      ? "border-emerald-500/30 bg-gradient-to-br from-emerald-500/10 via-background to-emerald-500/5"
+      : isNegative
+        ? "border-rose-500/30 bg-gradient-to-br from-rose-500/10 via-background to-rose-500/5"
+        : "border-border bg-card"
+      }`}
+  >
+    <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+      <div>
+        <div className="flex items-center gap-2">
+          <span className="text-xs font-extrabold uppercase tracking-widest text-muted-foreground">
+            Final Settlement Formula / अंतिम सेटलमेंट
+          </span>
+          <span
+            className={`inline-flex items-center rounded-full px-3 py-0.5 text-xs font-extrabold shadow-sm ${isPositive
+              ? "bg-emerald-600 text-white"
+              : isNegative
+                ? "bg-rose-600 text-white"
+                : "bg-muted text-muted-foreground"
+              }`}
           >
-            {copiedId === "all_users_copy" ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
-            {copiedId === "all_users_copy" ? "Copied Total!" : "Copy Active Report"}
-          </button>
-        }
-      >
-        <div className="space-y-4">
-          <DataTable headers={["एजंट / युझर", "एकूण कलेक्शन", "कमिशन", "विन अमाऊंट", "अंतिम सेटलमेंट", "स्थिती", "Action (कॉपी)"]}>
-            {allUsersReport.map((stat) => {
-              const userMsg = generateSettlementMessage(
-                stat.user.name,
-                stat.collection,
-                stat.commission,
-                stat.winAmount
-              );
-              const absVal = Math.abs(stat.balance);
-              const isSelected = String(stat.user.id) === String(selectedAgentId);
+            स्थिती: {statusBadgeText}
+          </span>
+        </div>
 
-              return (
-                <tr 
-                  key={stat.user.id} 
-                  className={`transition-colors hover:bg-muted/30 ${isSelected ? "bg-primary/5 font-semibold" : ""}`}
-                >
-                  <td className="font-medium">
-                    <div className="flex items-center gap-2">
-                      <button
-                        title="View user settlement"
-                        onClick={() => setSelectedAgentId(String(stat.user.id))}
-                        className="text-left hover:text-primary hover:underline"
-                      >
-                        <span className="font-bold">{stat.user.name}</span>
-                        <br />
-                        <span className="text-xs text-muted-foreground">{stat.user.phone || "No phone"}</span>
-                      </button>
-                    </div>
-                  </td>
-                  <td className="font-bold text-foreground">
-                    {money.format(stat.collection)}
+        <div className="mt-2 flex items-baseline gap-3">
+          <span className="text-sm font-semibold text-muted-foreground">Final Balance:</span>
+          <span
+            className={`text-3xl font-black md:text-4xl ${isPositive
+              ? "text-emerald-600 dark:text-emerald-400"
+              : isNegative
+                ? "text-rose-600 dark:text-rose-400"
+                : "text-foreground"
+              }`}
+          >
+            {isPositive ? `+₹${absBalance.toLocaleString("en-IN")}` : isNegative ? `-₹${absBalance.toLocaleString("en-IN")}` : `₹0`}
+          </span>
+        </div>
+
+        <p className="mt-2 text-sm font-bold text-foreground">
+          👉 {statusActionMessage}
+        </p>
+      </div>
+
+      {/* Formula calculation badge with quick copy */}
+      <div className="flex flex-col items-end gap-2">
+        <div className="rounded-xl border border-border/80 bg-background/80 p-3 text-xs backdrop-blur-sm">
+          <p className="font-bold text-muted-foreground">हिशोब सूत्र (Calculation):</p>
+          <p className="mt-1 font-mono font-semibold">
+            कलेक्शन ({money.format(totalCollection)})
+            <br />− कमिशन ({money.format(totalCommission)})
+            <br />− विन अमाऊंट ({money.format(totalWinAmount)})
+            <br />
+            <span className="font-bold underline underline-offset-2">
+              = {isPositive ? `+₹${absBalance.toLocaleString("en-IN")}` : isNegative ? `-₹${absBalance.toLocaleString("en-IN")}` : `₹0`}
+            </span>
+          </p>
+        </div>
+        <button
+          onClick={() => copyToClipboard(activeSettlementMessage, "hero")}
+          className="inline-flex items-center gap-1.5 rounded-md border border-border bg-background px-3 py-1.5 text-xs font-bold shadow-sm transition hover:bg-muted"
+        >
+          {copiedId === "hero" ? <Check className="h-3.5 w-3.5 text-green-600" /> : <Copy className="h-3.5 w-3.5 text-primary" />}
+          {copiedId === "hero" ? "Copied!" : "Copy Report"}
+        </button>
+      </div>
+    </div>
+  </div>
+
+
+
+  {/* All Users Agent Settlement Table (Admin Panel Only feature to see ALL users) */ }
+  <Panel
+    title={`सर्व युझर्स एजंट सेटलमेंट यादी (${allUsersReport.length} Users · ${periodLabel})`}
+    action={
+      <button
+        onClick={() => copyToClipboard(activeSettlementMessage, "all_users_copy")}
+        className="inline-flex items-center gap-1.5 rounded-md bg-primary px-3 py-1.5 text-xs font-bold text-primary-foreground shadow transition hover:opacity-95"
+      >
+        {copiedId === "all_users_copy" ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
+        {copiedId === "all_users_copy" ? "Copied Total!" : "Copy Active Report"}
+      </button>
+    }
+  >
+    <div className="space-y-4">
+      <DataTable headers={["एजंट / युझर", "एकूण कलेक्शन", "कमिशन", "विन अमाऊंट", "अंतिम सेटलमेंट", "स्थिती", "Action (कॉपी)"]}>
+        {allUsersReport.map((stat) => {
+          const userMsg = generateSettlementMessage(
+            stat.user.name,
+            stat.collection,
+            stat.commission,
+            stat.winAmount
+          );
+          const absVal = Math.abs(stat.balance);
+          const isSelected = String(stat.user.id) === String(selectedAgentId);
+
+          return (
+            <tr
+              key={stat.user.id}
+              className={`transition-colors hover:bg-muted/30 ${isSelected ? "bg-primary/5 font-semibold" : ""}`}
+            >
+              <td className="font-medium">
+                <div className="flex items-center gap-2">
+                  <button
+                    title="View user settlement"
+                    onClick={() => setSelectedAgentId(String(stat.user.id))}
+                    className="text-left hover:text-primary hover:underline"
+                  >
+                    <span className="font-bold">{stat.user.name}</span>
                     <br />
-                    <span className="text-xs font-normal text-muted-foreground">{stat.bidsCount} bids</span>
-                  </td>
-                  <td className="font-semibold text-amber-600">
-                    {money.format(stat.commission)}
-                    <br />
-                    <span className="text-xs font-normal text-muted-foreground">({stat.commRate}%)</span>
-                  </td>
-                  <td className="font-semibold text-purple-600">
-                    {money.format(stat.winAmount)}
-                    <br />
-                    <span className="text-xs font-normal text-muted-foreground">{stat.winsCount} wins</span>
-                  </td>
-                  <td className={`font-black ${stat.isPositive ? "text-emerald-600" : stat.isNegative ? "text-rose-600" : "text-foreground"}`}>
-                    {stat.isPositive ? `+₹${absVal.toLocaleString("en-IN")}` : stat.isNegative ? `-₹${absVal.toLocaleString("en-IN")}` : "₹0"}
-                  </td>
-                  <td>
-                    <span
-                      className={`inline-flex rounded-full px-2.5 py-0.5 text-xs font-bold ${
-                        stat.isPositive
-                          ? "bg-emerald-500/10 text-emerald-600"
-                          : stat.isNegative
-                          ? "bg-rose-500/10 text-rose-600"
-                          : "bg-muted text-muted-foreground"
-                      }`}
-                    >
-                      {stat.isPositive ? "जमा (+)" : stat.isNegative ? "देणे (−)" : "शून्य"}
-                    </span>
-                  </td>
-                  <td>
-                    <div className="flex items-center gap-1.5">
-                      <button
-                        onClick={() => copyToClipboard(userMsg, `user_${stat.user.id}`)}
-                        title="Copy this agent's report"
-                        className="inline-flex items-center gap-1 rounded border border-border bg-background px-2.5 py-1 text-xs font-semibold shadow-sm transition hover:bg-muted"
-                      >
-                        {copiedId === `user_${stat.user.id}` ? (
-                          <Check className="h-3 w-3 text-green-600" />
-                        ) : (
-                          <Copy className="h-3 w-3 text-primary" />
-                        )}
-                        <span>{copiedId === `user_${stat.user.id}` ? "Copied" : "Copy"}</span>
-                      </button>
-                      <button
-                        onClick={() => setSelectedAgentId(String(stat.user.id))}
-                        title="Select & View Hero Card"
-                        className="inline-flex items-center gap-1 rounded bg-secondary px-2 py-1 text-xs font-semibold text-secondary-foreground transition hover:opacity-90"
-                      >
-                        <Eye className="h-3 w-3" />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              );
-            })}
-            {/* Grand Total Row */}
-            <tr className="bg-muted/40 font-black">
-              <td colSpan={1}>Grand Total / सर्व युझर्स एकूण:</td>
-              <td className="text-foreground">{money.format(allUsersReport.reduce((s, u) => s + u.collection, 0))}</td>
-              <td className="text-amber-600">{money.format(allUsersReport.reduce((s, u) => s + u.commission, 0))}</td>
-              <td className="text-purple-600">{money.format(allUsersReport.reduce((s, u) => s + u.winAmount, 0))}</td>
-              <td className="text-foreground">
-                {(() => {
-                  const totBal = allUsersReport.reduce((s, u) => s + u.balance, 0);
-                  const isPos = totBal > 0;
-                  const isNeg = totBal < 0;
-                  return isPos ? `+₹${Math.abs(totBal).toLocaleString("en-IN")}` : isNeg ? `-₹${Math.abs(totBal).toLocaleString("en-IN")}` : "₹0";
-                })()}
+                    <span className="text-xs text-muted-foreground">{stat.user.phone || "No phone"}</span>
+                  </button>
+                </div>
+              </td>
+              <td className="font-bold text-foreground">
+                {money.format(stat.collection)}
+                <br />
+                <span className="text-xs font-normal text-muted-foreground">{stat.bidsCount} bids</span>
+              </td>
+              <td className="font-semibold text-amber-600">
+                {money.format(stat.commission)}
+                <br />
+                <span className="text-xs font-normal text-muted-foreground">({stat.commRate}%)</span>
+              </td>
+              <td className="font-semibold text-purple-600">
+                {money.format(stat.winAmount)}
+                <br />
+                <span className="text-xs font-normal text-muted-foreground">{stat.winsCount} wins</span>
+              </td>
+              <td className={`font-black ${stat.isPositive ? "text-emerald-600" : stat.isNegative ? "text-rose-600" : "text-foreground"}`}>
+                {stat.isPositive ? `+₹${absVal.toLocaleString("en-IN")}` : stat.isNegative ? `-₹${absVal.toLocaleString("en-IN")}` : "₹0"}
               </td>
               <td>
-                {(() => {
-                  const totBal = allUsersReport.reduce((s, u) => s + u.balance, 0);
-                  return (
-                    <span className={`inline-flex rounded-full px-2.5 py-0.5 text-xs font-bold ${totBal > 0 ? "bg-emerald-500/10 text-emerald-600" : totBal < 0 ? "bg-rose-500/10 text-rose-600" : "bg-muted text-muted-foreground"}`}>
-                      {totBal > 0 ? "जमा (+)" : totBal < 0 ? "देणे (−)" : "शून्य"}
-                    </span>
-                  );
-                })()}
+                <span
+                  className={`inline-flex rounded-full px-2.5 py-0.5 text-xs font-bold ${stat.isPositive
+                    ? "bg-emerald-500/10 text-emerald-600"
+                    : stat.isNegative
+                      ? "bg-rose-500/10 text-rose-600"
+                      : "bg-muted text-muted-foreground"
+                    }`}
+                >
+                  {stat.isPositive ? "जमा (+)" : stat.isNegative ? "देणे (−)" : "शून्य"}
+                </span>
               </td>
               <td>
-                <button
-                  onClick={() => copyToClipboard(generateSettlementMessage("All Users / सर्व युझर्स", allUsersReport.reduce((s, u) => s + u.collection, 0), allUsersReport.reduce((s, u) => s + u.commission, 0), allUsersReport.reduce((s, u) => s + u.winAmount, 0)), "grand_total")}
-                  className="inline-flex items-center gap-1 rounded bg-primary px-2.5 py-1 text-xs font-bold text-primary-foreground shadow transition hover:opacity-95"
-                >
-                  {copiedId === "grand_total" ? <Check className="h-3 w-3" /> : <Copy className="h-3 w-3" />}
-                  <span>{copiedId === "grand_total" ? "Copied" : "Copy Total"}</span>
-                </button>
+                <div className="flex items-center gap-1.5">
+                  <button
+                    onClick={() => copyToClipboard(userMsg, `user_${stat.user.id}`)}
+                    title="Copy this agent's report"
+                    className="inline-flex items-center gap-1 rounded border border-border bg-background px-2.5 py-1 text-xs font-semibold shadow-sm transition hover:bg-muted"
+                  >
+                    {copiedId === `user_${stat.user.id}` ? (
+                      <Check className="h-3 w-3 text-green-600" />
+                    ) : (
+                      <Copy className="h-3 w-3 text-primary" />
+                    )}
+                    <span>{copiedId === `user_${stat.user.id}` ? "Copied" : "Copy"}</span>
+                  </button>
+                  <button
+                    onClick={() => setSelectedAgentId(String(stat.user.id))}
+                    title="Select & View Hero Card"
+                    className="inline-flex items-center gap-1 rounded bg-secondary px-2 py-1 text-xs font-semibold text-secondary-foreground transition hover:opacity-90"
+                  >
+                    <Eye className="h-3 w-3" />
+                  </button>
+                </div>
               </td>
             </tr>
-          </DataTable>
-        </div>
-      </Panel>
-
-      {/* Message Copy Preview Card */}
-      <Panel
-        title={`कॉपी मेसेज प्रिव्ह्यू (${agentDisplayName})`}
-        action={
-          <button
-            onClick={() => copyToClipboard(activeSettlementMessage, "preview")}
-            className="inline-flex items-center gap-1.5 rounded-md bg-primary px-3 py-1.5 text-xs font-bold text-primary-foreground shadow transition hover:opacity-95"
-          >
-            {copiedId === "preview" ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
-            {copiedId === "preview" ? "Copied!" : "Copy Format"}
-          </button>
-        }
-      >
-        <div className="relative rounded-lg border border-border bg-muted/30 p-4 font-mono text-xs leading-relaxed whitespace-pre-wrap">
-          {activeSettlementMessage}
-        </div>
-      </Panel>
+          );
+        })}
+        {/* Grand Total Row */}
+        <tr className="bg-muted/40 font-black">
+          <td colSpan={1}>Grand Total / सर्व युझर्स एकूण:</td>
+          <td className="text-foreground">{money.format(allUsersReport.reduce((s, u) => s + u.collection, 0))}</td>
+          <td className="text-amber-600">{money.format(allUsersReport.reduce((s, u) => s + u.commission, 0))}</td>
+          <td className="text-purple-600">{money.format(allUsersReport.reduce((s, u) => s + u.winAmount, 0))}</td>
+          <td className="text-foreground">
+            {(() => {
+              const totBal = allUsersReport.reduce((s, u) => s + u.balance, 0);
+              const isPos = totBal > 0;
+              const isNeg = totBal < 0;
+              return isPos ? `+₹${Math.abs(totBal).toLocaleString("en-IN")}` : isNeg ? `-₹${Math.abs(totBal).toLocaleString("en-IN")}` : "₹0";
+            })()}
+          </td>
+          <td>
+            {(() => {
+              const totBal = allUsersReport.reduce((s, u) => s + u.balance, 0);
+              return (
+                <span className={`inline-flex rounded-full px-2.5 py-0.5 text-xs font-bold ${totBal > 0 ? "bg-emerald-500/10 text-emerald-600" : totBal < 0 ? "bg-rose-500/10 text-rose-600" : "bg-muted text-muted-foreground"}`}>
+                  {totBal > 0 ? "जमा (+)" : totBal < 0 ? "देणे (−)" : "शून्य"}
+                </span>
+              );
+            })()}
+          </td>
+          <td>
+            <button
+              onClick={() => copyToClipboard(generateSettlementMessage("All Users / सर्व युझर्स", allUsersReport.reduce((s, u) => s + u.collection, 0), allUsersReport.reduce((s, u) => s + u.commission, 0), allUsersReport.reduce((s, u) => s + u.winAmount, 0)), "grand_total")}
+              className="inline-flex items-center gap-1 rounded bg-primary px-2.5 py-1 text-xs font-bold text-primary-foreground shadow transition hover:opacity-95"
+            >
+              {copiedId === "grand_total" ? <Check className="h-3 w-3" /> : <Copy className="h-3 w-3" />}
+              <span>{copiedId === "grand_total" ? "Copied" : "Copy Total"}</span>
+            </button>
+          </td>
+        </tr>
+      </DataTable>
     </div>
+  </Panel>
+
+  {/* Message Copy Preview Card */ }
+  <Panel
+    title={`कॉपी मेसेज प्रिव्ह्यू (${agentDisplayName})`}
+    action={
+      <button
+        onClick={() => copyToClipboard(activeSettlementMessage, "preview")}
+        className="inline-flex items-center gap-1.5 rounded-md bg-primary px-3 py-1.5 text-xs font-bold text-primary-foreground shadow transition hover:opacity-95"
+      >
+        {copiedId === "preview" ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
+        {copiedId === "preview" ? "Copied!" : "Copy Format"}
+      </button>
+    }
+  >
+    <div className="relative rounded-lg border border-border bg-muted/30 p-4 font-mono text-xs leading-relaxed whitespace-pre-wrap">
+      {activeSettlementMessage}
+    </div>
+  </Panel>
+    </div >
   );
 }
