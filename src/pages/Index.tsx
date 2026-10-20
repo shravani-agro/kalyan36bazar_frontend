@@ -18,7 +18,8 @@ import {
   Users,
   X,
   ListFilter,
-  ClipboardList
+  ClipboardList,
+  ReceiptText
 } from "lucide-react";
 import { toast } from "sonner";
 import { realApi as mockApi } from "../lib/api";
@@ -27,11 +28,12 @@ import type { AppUser, Market, WithdrawDetail, ResultRecord, Bid, WinHistory, Ba
 import { money, formatDate, getToday } from "@/components/ui/AdminUI";
 import { AdminModal, ModalState } from "@/components/modals/AdminModal";
 import { Dashboard, UsersModule, MarketsModule, ResultsModule, WinsModule, RecordsModule, CommissionModule, BidsModule, SubAdminsModule, SubAdminOverviewModule, ActivityLogModule } from "@/components/modules/AdminModules";
+import { AgentReportModule } from "@/components/modules/AgentReportModule";
 import { CircleDollarSign } from "lucide-react";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { Header } from "@/components/layout/Header";
 
-type Section = "dashboard" | "users" | "markets" | "results" | "wins" | "records" | "commission" | "bids" | "subadmins" | "activity" | "overview";
+type Section = "dashboard" | "users" | "agent_report" | "markets" | "results" | "wins" | "records" | "commission" | "bids" | "subadmins" | "activity" | "overview";
 
 type Filters = {
   status: string;
@@ -46,6 +48,7 @@ const navItems: Array<{ id: Section; label: string; icon: any }> = [
   { id: "dashboard", label: "Dashboard", icon: Gauge },
   { id: "overview", label: "Overview", icon: BarChart3 },
   { id: "users", label: "Users", icon: Users },
+  { id: "agent_report", label: "Agent Report", icon: ReceiptText },
   { id: "markets", label: "Markets", icon: DoorOpen },
   { id: "bids", label: "All Bids", icon: ListFilter },
   { id: "results", label: "Results", icon: Trophy },
@@ -110,6 +113,7 @@ function App({ isSubAdminPortal = false }: { isSubAdminPortal?: boolean }) {
       return navItems.filter(item => {
         if (item.id === "overview") return true;
         if (item.id === "users") return true; // My Users
+        if (item.id === "agent_report") return true; // Agent Report
         if (item.id === "commission") return user.show_commission !== false;
         if (item.id === "results") return user.show_result !== false;
         if (item.id === "records") return user.show_bid_data !== false;
@@ -340,6 +344,16 @@ function App({ isSubAdminPortal = false }: { isSubAdminPortal?: boolean }) {
               onCreate={!isSubAdmin ? () => setModal({ kind: "user", mode: "create" }) : undefined}
               onEdit={!isSubAdmin ? (item) => setModal({ kind: "user", mode: "edit", item }) : undefined}
               onDelete={!isSubAdmin ? (id) => remove("app_users", id, "user") : undefined}
+            />
+          )}
+          {section === "agent_report" && (
+            <AgentReportModule
+              users={displayUsers}
+              bids={displayBids}
+              wins={displayWins}
+              filters={filters}
+              updateFilter={(k, v) => setFilters(f => ({ ...f, [k]: v }))}
+              assignedUserIds={assignedUserIds || undefined}
             />
           )}
           {section === "markets" && <MarketsModule items={filteredMarkets} onCreate={() => setModal({ kind: "market", mode: "create" })} onEdit={(item) => setModal({ kind: "market", mode: "edit", item })} onDelete={(id) => remove("markets", id, "market")} />}
