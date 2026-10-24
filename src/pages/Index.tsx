@@ -132,11 +132,36 @@ function App({ isSubAdminPortal = false }: { isSubAdminPortal?: boolean }) {
           setSection("overview");
         }
       }
-      void loadAll();
-      const interval = window.setInterval(() => void loadAll(false), 15000);
-      return () => window.clearInterval(interval);
     }
-  }, [session, filteredNavItems, section]);
+  }, [session, filteredNavItems]);
+
+  // Core initial load: markets and users for lookups across all screens
+  useEffect(() => {
+    if (session) {
+      void loadMarkets();
+      void loadUsers();
+    }
+  }, [session]);
+
+  // Section-specific loader: whenever user navigates or filters change, call ONLY that section's API
+  useEffect(() => {
+    if (!session) return;
+    if (section === "markets") void loadMarkets();
+    else if (section === "users") void loadUsers();
+    else if (section === "results") void loadResults();
+    else if (section === "bids") void loadDetailedBids();
+    else if (section === "wins") void loadWins();
+    else if (section === "activity") void loadActivityLogs();
+    else if (section === "subadmins") void loadSubAdmins();
+    else void loadDashboardData();
+  }, [session, section, filters.date, filters.marketId]);
+
+  // Periodic background refresh for currently active section only
+  useEffect(() => {
+    if (!session) return;
+    const interval = window.setInterval(() => void loadAll(false), 20000);
+    return () => window.clearInterval(interval);
+  }, [session, section, filters.date, filters.marketId]);
 
   const userRole = (session?.user as any)?.role;
   const isSubAdmin = userRole === "subadmin";
@@ -176,7 +201,7 @@ function App({ isSubAdminPortal = false }: { isSubAdminPortal?: boolean }) {
   const userById = useMemo(() => new Map(displayUsers.map((user) => [user.id, user])), [displayUsers]);
   const marketById = useMemo(() => new Map(markets.map((market) => [market.id, market])), [markets]);
 
-  const filteredMarkets = useMemo(() => markets.filter((market) => filters.status === "all"), [markets, filters.status]);
+  const filteredMarkets = markets;
 
   const filteredResults = useMemo(() => results.filter((item) =>
     (!filters.date || item.result_date === filters.date) &&
@@ -270,21 +295,66 @@ function App({ isSubAdminPortal = false }: { isSubAdminPortal?: boolean }) {
     return { totalBidAmount, totalWithdraw, totalDeposit, totalCommission, digits, digitAmounts, typeCounts, marketStats };
   }, [displayBids, markets, displayTransactions, displayUsers, filters.date, filters.marketId]);
 
+  async function loadMarkets() {
+    const { data } = await mockApi.db.getMarkets();
+    if (data) setMarkets(data);
+  }
+
+  async function loadUsers() {
+    const { data } = await mockApi.db.getUsers();
+    if (data) setUsers(data);
+  }
+
+  async function loadResults() {
+    const { data } = await mockApi.db.getResults(filters.date, filters.marketId);
+    if (data) setResults(data);
+  }
+
+  async function loadDetailedBids() {
+    const { data } = await mockApi.db.getAllBids(filters.date, filters.marketId);
+    if (data) setDetailedBids(data);
+  }
+
+  async function loadWins() {
+    const { data } = await mockApi.db.getWinHistory();
+    if (data) setWins(data);
+  }
+
+  async function loadActivityLogs() {
+    const { data } = await mockApi.db.getActivityLogs();
+    if (data) setActivityLogs(data);
+  }
+
+  async function loadSubAdmins() {
+    const { data } = await mockApi.db.getSubAdmins();
+    if (data) setSubAdmins(data);
+  }
+
+  async function loadDashboardData() {
+    const [bidsRes, txRes, winsRes] = await Promise.all([
+      mockApi.db.getBidsByDate(filters.date, filters.marketId),
+      mockApi.db.getBalanceTransactions(),
+      mockApi.db.getWinHistory(),
+    ]);
+    if (bidsRes.data) setBids(bidsRes.data);
+    if (txRes.data) setTransactions(txRes.data);
+    if (winsRes.data) setWins(winsRes.data);
+  }
+
   async function loadAll(showSpinner = true) {
     if (showSpinner) setLoading(true);
-    const { data, error } = await mockApi.db.getAll();
-    if (!error) {
-      setUsers(data.app_users || []); setMarkets(data.markets || []);
-      setResults(data.results || []); setBids(data.bids || []); setWins(data.win_history || []);
-      setRecords(data.market_bid_records || []); setTransactions(data.balance_transactions || []);
-      setActivityLogs(data.activity_logs || []);
-      setWithdrawDetails(data.withdraw_details || []); setSubAdmins(data.sub_admins || []);
+    try {
+      if (section === "markets") await loadMarkets();
+      else if (section === "users") await loadUsers();
+      else if (section === "results") await loadResults();
+      else if (section === "bids") await loadDetailedBids();
+      else if (section === "wins") await loadWins();
+      else if (section === "activity") await loadActivityLogs();
+      else if (section === "subadmins") await loadSubAdmins();
+      else await loadDashboardData();
+    } finally {
+      if (showSpinner) setLoading(false);
     }
-
-    const { data: bidData } = await mockApi.db.getAllBids();
-    if (bidData) setDetailedBids(bidData);
-
-    if (showSpinner) setLoading(false);
   }
 
   async function remove(table: string, id: string, label: string) {
@@ -318,7 +388,7 @@ function App({ isSubAdminPortal = false }: { isSubAdminPortal?: boolean }) {
           filters={filters}
           markets={markets}
           loading={loading}
-          loadAll={() => void loadAll()}
+          loadAll={() => void loadAll(true)}
           handleLogout={handleLogout}
           updateFilter={(k, v) => setFilters(f => ({ ...f, [k]: v }))}
           resetFilters={() => setFilters(getEmptyFilters())}

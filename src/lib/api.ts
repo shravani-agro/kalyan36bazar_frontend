@@ -59,17 +59,100 @@ export const realApi = {
   },
 
   db: {
-    getAll: async () => {
+    getAll: async (bidDate?: string) => {
       try {
-        const res = await api.get("/api/all");
+        const res = await api.get("/api/all", {
+          params: bidDate ? { bid_date: bidDate } : undefined,
+        });
         return { data: res.data, error: null };
       } catch (err: any) {
         return { data: null, error: err.response?.data || { message: err.message } };
       }
     },
-    getAllBids: async () => {
+    getAllBids: async (bidDate?: string, marketId?: string, limit: number = 500, offset: number = 0) => {
       try {
-        const res = await api.get("/api/bids/all");
+        const params: any = { limit, offset };
+        if (bidDate) params.bid_date = bidDate;
+        if (marketId && marketId !== "all") params.market_id = marketId;
+        const res = await api.get("/api/bids/all", { params });
+        return { data: res.data, error: null };
+      } catch (err: any) {
+        return { data: null, error: err.response?.data || { message: err.message } };
+      }
+    },
+    getMarkets: async () => {
+      try {
+        const res = await api.get("/api/markets");
+        return { data: res.data, error: null };
+      } catch (err: any) {
+        return { data: null, error: err.response?.data || { message: err.message } };
+      }
+    },
+    getUsers: async () => {
+      try {
+        const res = await api.get("/api/users");
+        return { data: res.data, error: null };
+      } catch (err: any) {
+        return { data: null, error: err.response?.data || { message: err.message } };
+      }
+    },
+    getResults: async (resultDate?: string, marketId?: string) => {
+      try {
+        const params: any = {};
+        if (resultDate) params.result_date = resultDate;
+        if (marketId && marketId !== "all") params.market_id = marketId;
+        const res = await api.get("/api/results", { params });
+        return { data: res.data, error: null };
+      } catch (err: any) {
+        return { data: null, error: err.response?.data || { message: err.message } };
+      }
+    },
+    getBidsByDate: async (bidDate?: string, marketId?: string) => {
+      try {
+        const params: any = {};
+        if (bidDate) params.bid_date = bidDate;
+        if (marketId && marketId !== "all") params.market_id = marketId;
+        const res = await api.get("/api/bids/by-date", { params });
+        return { data: res.data, error: null };
+      } catch (err: any) {
+        return { data: null, error: err.response?.data || { message: err.message } };
+      }
+    },
+    getWinHistory: async (limit: number = 200) => {
+      try {
+        const res = await api.get("/api/win_history", { params: { limit } });
+        return { data: res.data, error: null };
+      } catch (err: any) {
+        return { data: null, error: err.response?.data || { message: err.message } };
+      }
+    },
+    getSubAdmins: async () => {
+      try {
+        const res = await api.get("/api/sub_admins");
+        return { data: res.data, error: null };
+      } catch (err: any) {
+        return { data: null, error: err.response?.data || { message: err.message } };
+      }
+    },
+    getActivityLogs: async (limit: number = 100) => {
+      try {
+        const res = await api.get("/api/activity_logs", { params: { limit } });
+        return { data: res.data, error: null };
+      } catch (err: any) {
+        return { data: null, error: err.response?.data || { message: err.message } };
+      }
+    },
+    getBalanceTransactions: async (limit: number = 200) => {
+      try {
+        const res = await api.get("/api/balance_transactions", { params: { limit } });
+        return { data: res.data, error: null };
+      } catch (err: any) {
+        return { data: null, error: err.response?.data || { message: err.message } };
+      }
+    },
+    getWithdrawDetails: async (limit: number = 100) => {
+      try {
+        const res = await api.get("/api/withdraw_details", { params: { limit } });
         return { data: res.data, error: null };
       } catch (err: any) {
         return { data: null, error: err.response?.data || { message: err.message } };
