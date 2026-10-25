@@ -129,7 +129,7 @@ function ChartExportTemplate({
         {/* Header */}
         <div style={{ display: "flex", borderBottom: "2px solid #000", height: "90px", flexShrink: 0 }}>
           <div style={{ width: "35%", borderRight: "2px solid #000", padding: "0 12px", display: "flex", flexDirection: "column", justifyContent: "center", boxSizing: "border-box" }}>
-            <h1 style={{ fontSize: "36px", fontWeight: "900", margin: "0", lineHeight: "1", textAlign: "center" }}>मिलन ३६ बाज़ार</h1>
+            <h1 style={{ fontSize: "36px", fontWeight: "900", margin: "0", lineHeight: "1", textAlign: "center" }}>कल्याण ३६ बाज़ार</h1>
             <h2 style={{ fontSize: "16px", fontWeight: "bold", margin: "8px 0 0 0", textAlign: "left" }}>दिनांक : {currentExportDateDisplay}</h2>
           </div>
           <div style={{ width: "65%", display: "flex", alignItems: "center", justifyContent: "center", boxSizing: "border-box" }}>
