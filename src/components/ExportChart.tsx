@@ -84,10 +84,12 @@ function ChartExportTemplate({
   baseDateStr,
   markets,
   results,
+  blankTemplate = false,
 }: {
   baseDateStr: string;
   markets: Market[];
   results: ResultRecord[];
+  blankTemplate?: boolean;
 }) {
   const dates = getChartDateRange(baseDateStr);
   const timeCols = generateTimeColumns();
@@ -118,35 +120,171 @@ function ChartExportTemplate({
       style={{
         width: "1414px",
         height: "1000px",
-        padding: "20px",
+        padding: "24px 28px",
         boxSizing: "border-box",
-        backgroundColor: "white",
-        color: "black",
-        fontFamily: "'Inter', sans-serif",
+        backgroundColor: "#ffffff",
+        color: "#000000",
+        fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
       }}
     >
-      <div style={{ border: "2px solid #000", padding: "4px", height: "100%", boxSizing: "border-box", display: "flex", flexDirection: "column" }}>
-        {/* Header */}
-        <div style={{ display: "flex", borderBottom: "2px solid #000", height: "90px", flexShrink: 0 }}>
-          <div style={{ width: "35%", borderRight: "2px solid #000", padding: "0 12px", display: "flex", flexDirection: "column", justifyContent: "center", boxSizing: "border-box" }}>
-            <h1 style={{ fontSize: "36px", fontWeight: "900", margin: "0", lineHeight: "1", textAlign: "center" }}>कल्याण ३६ बाज़ार</h1>
-            <h2 style={{ fontSize: "16px", fontWeight: "bold", margin: "8px 0 0 0", textAlign: "left" }}>दिनांक : {currentExportDateDisplay}</h2>
+      <div
+        style={{
+          border: "2.5px solid #000000",
+          height: "100%",
+          boxSizing: "border-box",
+          display: "flex",
+          flexDirection: "column",
+          backgroundColor: "#ffffff",
+        }}
+      >
+        {/* Top Header */}
+        <div
+          style={{
+            display: "flex",
+            borderBottom: "2px solid #000000",
+            height: "150px",
+            flexShrink: 0,
+            boxSizing: "border-box",
+          }}
+        >
+          {/* Left Header Box (Hindi Title + Date) */}
+          <div
+            style={{
+              width: "47.5%",
+              padding: "16px 20px",
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "space-between",
+              boxSizing: "border-box",
+            }}
+          >
+            <div
+              style={{
+                fontFamily: "'Noto Sans Devanagari', 'Akruti', 'Mangal', sans-serif",
+                fontSize: "48px",
+                fontWeight: "900",
+                color: "#000000",
+                lineHeight: "1.1",
+                letterSpacing: "0.5px",
+              }}
+            >
+              कल्याण ३६ बाजार
+            </div>
+            <div
+              style={{
+                fontFamily: "'Noto Sans Devanagari', 'Akruti', 'Mangal', sans-serif",
+                fontSize: "28px",
+                fontWeight: "800",
+                color: "#000000",
+                lineHeight: "1.1",
+              }}
+            >
+              दिनांक : {blankTemplate ? "" : currentExportDateDisplay}
+            </div>
           </div>
-          <div style={{ width: "65%", display: "flex", alignItems: "center", justifyContent: "center", boxSizing: "border-box" }}>
-            <h1 style={{ fontSize: "48px", fontWeight: "900", margin: "0", letterSpacing: "2px", lineHeight: "1", paddingBottom: "10px" }}>KALYAN 36 BAZAR</h1>
+
+          {/* Double Vertical Divider with spacing identical to panelchartpdf.pdf */}
+          <div
+            style={{
+              width: "14px",
+              borderLeft: "2px solid #000000",
+              borderRight: "2px solid #000000",
+              backgroundColor: "#ffffff",
+              flexShrink: 0,
+              boxSizing: "border-box",
+            }}
+          />
+
+          {/* Right Header Box (KALYAN 36 BAZAR + RSBOSS.NET) */}
+          <div
+            style={{
+              flex: 1,
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              justifyContent: "center",
+              boxSizing: "border-box",
+              padding: "8px 16px",
+            }}
+          >
+            <div
+              style={{
+                fontFamily: "'Arial Black', 'Montserrat', Impact, 'Segoe UI Black', sans-serif",
+                fontSize: "50px",
+                fontWeight: "900",
+                color: "#000000",
+                letterSpacing: "2px",
+                lineHeight: "1.05",
+                textAlign: "center",
+                textTransform: "uppercase",
+              }}
+            >
+              KALYAN 36 BAZAR
+            </div>
+            <div
+              style={{
+                fontFamily: "'Arial Black', 'Montserrat', Impact, 'Segoe UI Black', sans-serif",
+                fontSize: "44px",
+                fontWeight: "900",
+                color: "#000000",
+                letterSpacing: "1.5px",
+                lineHeight: "1.05",
+                marginTop: "10px",
+                textAlign: "center",
+                textTransform: "uppercase",
+              }}
+            >
+              RSBOSS.NET
+            </div>
           </div>
         </div>
 
-        {/* Table */}
-        <div style={{ height: "calc(100% - 90px)", width: "100%", overflow: "hidden" }}>
-          <table style={{ width: "100%", height: "100%", borderCollapse: "collapse", tableLayout: "fixed" }}>
+        {/* Table Area (36 Time Columns + Date) */}
+        <div style={{ flex: 1, width: "100%", overflow: "hidden" }}>
+          <table
+            style={{
+              width: "100%",
+              height: "100%",
+              borderCollapse: "collapse",
+              tableLayout: "fixed",
+            }}
+          >
             <thead>
-              <tr>
-                <th style={{ border: "1px solid #888", width: "50px", padding: "8px 0", fontSize: "12px", color: "red", backgroundColor: "#f9f9f9", verticalAlign: "middle" }}>date</th>
+              <tr style={{ height: "46px" }}>
+                <th
+                  style={{
+                    border: "1px solid #000000",
+                    width: "48px",
+                    padding: "3px 0",
+                    fontSize: "13px",
+                    fontWeight: "bold",
+                    fontFamily: "Arial, sans-serif",
+                    color: "#000000",
+                    backgroundColor: "#ffffff",
+                    verticalAlign: "middle",
+                    textAlign: "center",
+                  }}
+                >
+                  Date
+                </th>
                 {timeCols.map((tc, idx) => (
-                  <th key={idx} style={{ border: "1px solid #888", padding: "8px 0", fontSize: "10px", textAlign: "center", color: "red", backgroundColor: "#f9f9f9", lineHeight: "1.2", verticalAlign: "middle" }}>
-                    <div style={{ paddingBottom: "3px" }}>{tc.displayTop}</div>
-                    <div style={{ paddingBottom: "2px" }}>{tc.displayBottom}</div>
+                  <th
+                    key={idx}
+                    style={{
+                      border: "1px solid #000000",
+                      padding: "2px 0",
+                      fontSize: "10.5px",
+                      fontWeight: "bold",
+                      fontFamily: "Arial, sans-serif",
+                      textAlign: "center",
+                      color: "#000000",
+                      backgroundColor: "#ffffff",
+                      lineHeight: "1.15",
+                      verticalAlign: "middle",
+                    }}
+                  >
+                    <div>{tc.displayTop}</div>
+                    <div>{tc.displayBottom}</div>
                   </th>
                 ))}
               </tr>
@@ -155,41 +293,83 @@ function ChartExportTemplate({
               {dates.map((d, rowIdx) => {
                 const dateStr = formatDateLocal(d);
                 const isSunday = d.getDay() === 0;
-                const displayColor = isSunday ? "red" : "black";
 
                 return (
                   <tr key={rowIdx}>
-                    <td style={{ border: "1px solid #888", textAlign: "center", verticalAlign: "middle", padding: "2px 0", color: displayColor, lineHeight: "1.2", fontSize: "12px", fontWeight: "bold" }}>
-                      <div>{formatDisplayDate(d)}</div>
-                      <div>{d.getFullYear()}</div>
+                    <td
+                      style={{
+                        border: "1px solid #000000",
+                        textAlign: "center",
+                        verticalAlign: "middle",
+                        padding: "2px 0",
+                        color: isSunday ? "#d00000" : "#000000",
+                        lineHeight: "1.15",
+                        fontSize: "11px",
+                        fontWeight: "bold",
+                        fontFamily: "Arial, sans-serif",
+                        backgroundColor: "#ffffff",
+                      }}
+                    >
+                      {!blankTemplate ? (
+                        <>
+                          <div>{formatDisplayDate(d)}</div>
+                          <div>{d.getFullYear()}</div>
+                        </>
+                      ) : null}
                     </td>
                     {timeCols.map((tc, colIdx) => {
                       const colMinutes = timeStringToMinutes(tc.timeStr);
                       const result = resultMap.get(`${dateStr}_${colMinutes}`);
 
-                      const cellTime = new Date(d);
-                      cellTime.setHours(0, 0, 0, 0); // Ensure midnight
-                      cellTime.setHours(Math.floor(colMinutes / 60), colMinutes % 60, 0, 0);
-
-                      const isPast = cellTime <= today;
-
                       let openPana = "";
                       let openDigit = "";
 
-                      if (result) {
-                        openPana = result.open_pana || "***";
-                        openDigit = result.open_digit !== undefined && result.open_digit !== null ? String(result.open_digit) : "*";
-                      } else {
-                        if (isPast) {
-                          openPana = "***";
-                          openDigit = "*";
-                        }
+                      if (!blankTemplate && result) {
+                        openPana = result.open_pana || "";
+                        openDigit =
+                          result.open_digit !== undefined && result.open_digit !== null
+                            ? String(result.open_digit)
+                            : "";
                       }
 
                       return (
-                        <td key={colIdx} style={{ border: "1px solid #888", textAlign: "center", verticalAlign: "middle", padding: "6px 0", lineHeight: "1.1" }}>
-                          <div style={{ fontSize: "16px", fontWeight: "bold", color: "black", letterSpacing: "1px" }}>{openPana}</div>
-                          <div style={{ fontSize: "17px", fontWeight: "bold", color: "black", marginTop: "2px" }}>{openDigit}</div>
+                        <td
+                          key={colIdx}
+                          style={{
+                            border: "1px solid #000000",
+                            textAlign: "center",
+                            verticalAlign: "middle",
+                            padding: "2px 0",
+                            lineHeight: "1.1",
+                            backgroundColor: "#ffffff",
+                          }}
+                        >
+                          {openPana ? (
+                            <>
+                              <div
+                                style={{
+                                  fontSize: "13px",
+                                  fontWeight: "bold",
+                                  color: "#000000",
+                                  letterSpacing: "0.5px",
+                                  fontFamily: "Arial, sans-serif",
+                                }}
+                              >
+                                {openPana}
+                              </div>
+                              <div
+                                style={{
+                                  fontSize: "14px",
+                                  fontWeight: "bold",
+                                  color: "#000000",
+                                  marginTop: "2px",
+                                  fontFamily: "Arial, sans-serif",
+                                }}
+                              >
+                                {openDigit}
+                              </div>
+                            </>
+                          ) : null}
                         </td>
                       );
                     })}
@@ -208,7 +388,7 @@ export const downloadChartPDF = async (
   baseDateStr: string,
   markets: Market[],
   results: ResultRecord[],
-  onComplete?: () => void
+  options?: { blankTemplate?: boolean; onComplete?: () => void }
 ) => {
   // Create a hidden container
   const container = document.createElement("div");
@@ -219,22 +399,35 @@ export const downloadChartPDF = async (
 
   const root = createRoot(container);
 
-  root.render(<ChartExportTemplate baseDateStr={baseDateStr} markets={markets} results={results} />);
+  root.render(
+    <ChartExportTemplate
+      baseDateStr={baseDateStr}
+      markets={markets}
+      results={results}
+      blankTemplate={options?.blankTemplate}
+    />
+  );
 
-  // Give React time to render
+  // Wait for fonts and DOM rendering
   setTimeout(async () => {
     try {
+      if (document.fonts) {
+        await document.fonts.ready;
+      }
+
       const element = document.getElementById("chart-export-container");
       if (!element) throw new Error("Chart container not found");
 
       const canvas = await html2canvas(element, {
-        scale: 2, // higher resolution
+        scale: 2.5, // High-resolution print quality
         useCORS: true,
+        backgroundColor: "#ffffff",
         width: 1414,
         height: 1000,
+        logging: false,
       });
 
-      const imgData = canvas.toDataURL("image/jpeg", 1.0);
+      const imgData = canvas.toDataURL("image/png");
       const pdf = new jsPDF({
         orientation: "landscape",
         unit: "mm",
@@ -242,14 +435,19 @@ export const downloadChartPDF = async (
       });
 
       // A4 landscape is 297 x 210 mm
-      pdf.addImage(imgData, "JPEG", 0, 0, 297, 210);
-      pdf.save("kalyan36-panel-chart.pdf");
+      pdf.addImage(imgData, "PNG", 0, 0, 297, 210);
+      const filename = options?.blankTemplate
+        ? "kalyan36-panel-chart-blank.pdf"
+        : "kalyan36-panel-chart.pdf";
+      pdf.save(filename);
     } catch (err) {
       console.error("Failed to generate PDF", err);
     } finally {
       root.unmount();
-      document.body.removeChild(container);
-      if (onComplete) onComplete();
+      if (container.parentNode) {
+        container.parentNode.removeChild(container);
+      }
+      if (options?.onComplete) options.onComplete();
     }
   }, 500);
 };
@@ -264,40 +462,62 @@ export function ExportChartButton({
   results: ResultRecord[];
 }) {
   const [isExporting, setIsExporting] = React.useState(false);
+  const [isBlankExporting, setIsBlankExporting] = React.useState(false);
 
-  const handleExport = async () => {
-    setIsExporting(true);
+  const handleExport = async (blank: boolean = false) => {
+    if (blank) {
+      setIsBlankExporting(true);
+    } else {
+      setIsExporting(true);
+    }
 
     let finalMarkets = markets;
     let finalResults = results;
 
-    // Fetch perfectly fresh data from the dedicated FastAPI endpoint before creating PDF
-    try {
-      const res = await fetch("http://localhost:8000/api/get_pdf_results");
-      if (res.ok) {
-        const data = await res.json();
-        if (data.status === "success" && data.markets && data.results) {
-          finalMarkets = data.markets;
-          finalResults = data.results;
+    if (!blank) {
+      // Fetch fresh data from backend
+      try {
+        const res = await fetch("http://localhost:8000/api/get_pdf_results");
+        if (res.ok) {
+          const data = await res.json();
+          if (data.status === "success" && data.markets && data.results) {
+            finalMarkets = data.markets;
+            finalResults = data.results;
+          }
         }
+      } catch (err) {
+        console.warn("Failed to fetch from FastAPI endpoint, falling back to React state", err);
       }
-    } catch (err) {
-      console.warn("Failed to fetch from FastAPI endpoint, falling back to React state", err);
     }
 
-    downloadChartPDF(date, finalMarkets, finalResults, () => {
-      setIsExporting(false);
+    downloadChartPDF(date, finalMarkets, finalResults, {
+      blankTemplate: blank,
+      onComplete: () => {
+        setIsExporting(false);
+        setIsBlankExporting(false);
+      },
     });
   };
 
   return (
-    <button
-      onClick={handleExport}
-      disabled={isExporting}
-      className="btn-primary"
-    >
-      <Download className="mr-2 h-4 w-4" />
-      {isExporting ? "Exporting..." : "Export Chart PDF"}
-    </button>
+    <div className="flex items-center gap-2">
+      <button
+        onClick={() => handleExport(false)}
+        disabled={isExporting || isBlankExporting}
+        className="btn-primary"
+      >
+        <Download className="mr-2 h-4 w-4" />
+        {isExporting ? "Exporting..." : "Export Chart PDF"}
+      </button>
+      <button
+        onClick={() => handleExport(true)}
+        disabled={isExporting || isBlankExporting}
+        className="btn-secondary"
+        title="Download blank chart template identical to panelchartpdf.pdf"
+      >
+        <Download className="mr-2 h-4 w-4" />
+        {isBlankExporting ? "Exporting..." : "Blank Chart PDF"}
+      </button>
+    </div>
   );
 }
