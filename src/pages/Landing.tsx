@@ -224,21 +224,53 @@ export default function Landing() {
         else type = "Morning";
       }
 
-      // Live status logic (pulsing status marker)
+      // Check current day and time in IST
+      const istDate = new Date(currentTime.toLocaleString("en-US", { timeZone: "Asia/Kolkata" }));
+      const isSunday = istDate.getDay() === 0;
+      const currentHour = istDate.getHours();
+      const currentMinute = istDate.getMinutes();
+      const currentMinutes = currentHour * 60 + currentMinute;
+
+      // Extract market's open time in minutes
+      let openHour = 0;
+      let openMin = 0;
+      if (m.open_time) {
+        const timeStr = String(m.open_time).trim().toUpperCase();
+        const match = timeStr.match(/(\d+):(\d+)\s*(AM|PM)?/);
+        if (match) {
+          openHour = parseInt(match[1], 10);
+          openMin = parseInt(match[2], 10);
+          if (match[3] === 'PM' && openHour < 12) openHour += 12;
+          if (match[3] === 'AM' && openHour === 12) openHour = 0;
+        }
+      }
+      const marketMinutes = openHour * 60 + openMin;
+
+      // Sunday restriction: Market runs up to 4:00 PM (16:00 = 960 mins) only, after that it will close
       let isLive = false;
-      const hourStr = currentTime.toLocaleTimeString([], { hour: '2-digit', hour12: false });
-      const currentHour = parseInt(hourStr);
-      // Simulate live status elegantly based on name matching or simply active periods
-      if (type === "Day" && currentHour >= 11 && currentHour <= 18) isLive = true;
-      if (type === "Night" && (currentHour >= 20 || currentHour <= 2)) isLive = true;
-      if (type === "Morning" && currentHour >= 8 && currentHour <= 12) isLive = true;
+      let isSundayClosed = false;
+
+      if (isSunday) {
+        if (marketMinutes > 16 * 60 || currentMinutes >= 16 * 60) {
+          isSundayClosed = true;
+          isLive = false;
+        } else if (currentMinutes < marketMinutes) {
+          isLive = true;
+        }
+      } else {
+        // Mon-Sat: active if current time is before the market round time and within operating hours
+        if (currentMinutes >= 11 * 60 && currentMinutes < marketMinutes && currentMinutes <= 20 * 60) {
+          isLive = true;
+        }
+      }
 
       return {
         ...m,
-        close_time: closeTime,
+        close_time: isSundayClosed && marketMinutes > 16 * 60 ? "Sunday Closed (Runs Upto 4 PM)" : closeTime,
         result: displayResult,
         type,
-        isLive
+        isLive,
+        isSundayClosed
       };
     });
   }, [dbMarkets, dbResults, currentTime]);

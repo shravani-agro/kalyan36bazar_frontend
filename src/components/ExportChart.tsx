@@ -3,6 +3,7 @@ import { Market, ResultRecord } from "@/lib/mockApi";
 import jsPDF from "jspdf";
 import { Download } from "lucide-react";
 import templateImgUrl from "@/assets/panelchartpdf_page1.png";
+import rsbossResults from "@/data/rsboss_results.json";
 
 const getChartDateRange = (baseDateStr: string) => {
   const baseDate = new Date(baseDateStr);
@@ -12,13 +13,38 @@ const getChartDateRange = (baseDateStr: string) => {
   const currentWeekMonday = new Date(baseDate);
   currentWeekMonday.setDate(baseDate.getDate() + diffToMonday);
 
-  const lastWeekMonday = new Date(currentWeekMonday);
-  lastWeekMonday.setDate(currentWeekMonday.getDate() - 7);
+  // Check if today is Sunday and current time has passed 4:00 PM (16:00 IST)
+  // When Sunday 4 PM ends, the current week has finished, so the chart moves
+  // upward: Week 1 becomes the week ending on Sunday (e.g. Oct 19 - Oct 25)
+  // and Week 2 becomes the upcoming week (e.g. Oct 26 - Nov 01), leaving it blank for next week!
+  const now = new Date();
+  const nowIST = new Date(now.toLocaleString("en-US", { timeZone: "Asia/Kolkata" }));
+  const todayStr = new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Kolkata" }).format(now);
+
+  const isCurrentSundayAfter4 =
+    nowIST.getDay() === 0 &&
+    (nowIST.getHours() > 16 || (nowIST.getHours() === 16 && nowIST.getMinutes() >= 0));
+
+  // Shift if it's currently Sunday after 4 PM and viewing today or the current week
+  const isSundayToday =
+    day === 0 &&
+    (baseDateStr === todayStr || Math.abs(baseDate.getTime() - now.getTime()) < 24 * 3600 * 1000);
+  const shouldShiftNextWeek = isCurrentSundayAfter4 && isSundayToday;
+
+  let startMonday = new Date(currentWeekMonday);
+  if (shouldShiftNextWeek) {
+    // Current week moves upward to top 7 rows (startMonday = current week Monday),
+    // and bottom 7 rows become the blank new week!
+    startMonday = new Date(currentWeekMonday);
+  } else {
+    // Standard: last week's Monday to current week's Sunday
+    startMonday.setDate(currentWeekMonday.getDate() - 7);
+  }
 
   const dates = [];
   for (let i = 0; i < 14; i++) {
-    const d = new Date(lastWeekMonday);
-    d.setDate(lastWeekMonday.getDate() + i);
+    const d = new Date(startMonday);
+    d.setDate(startMonday.getDate() + i);
     dates.push(d);
   }
   return dates;
@@ -79,6 +105,42 @@ function timeStringToMinutes(timeStr: string): number {
   return h * 60 + m;
 }
 
+function buildResultMap(markets: Market[], results: ResultRecord[]): Map<string, ResultRecord> {
+  const resultMap = new Map<string, ResultRecord>();
+
+  // 1. First populate with RSBOSS authentic historical results
+  if (Array.isArray(rsbossResults)) {
+    for (const item of (rsbossResults as any[])) {
+      const min = timeStringToMinutes(item.time);
+      if (min !== -1) {
+        resultMap.set(`${item.result_date}_${min}`, {
+          id: `rsboss_${item.result_date}_${min}`,
+          result_date: item.result_date,
+          market_id: "",
+          open_pana: item.open_pana,
+          open_digit: item.open_digit,
+          created_at: item.result_date,
+        });
+      }
+    }
+  }
+
+  // 2. Overlay live results from database (if any)
+  const marketTimeMap = new Map<string, number>();
+  for (const m of markets) {
+    marketTimeMap.set(String(m.id), timeStringToMinutes(m.open_time));
+  }
+
+  for (const r of results) {
+    const minutes = marketTimeMap.get(String(r.market_id));
+    if (minutes !== undefined && minutes !== -1) {
+      resultMap.set(`${r.result_date}_${minutes}`, r);
+    }
+  }
+
+  return resultMap;
+}
+
 function ChartExportTemplate({
   baseDateStr,
   markets,
@@ -92,23 +154,7 @@ function ChartExportTemplate({
 }) {
   const dates = getChartDateRange(baseDateStr);
   const timeCols = generateTimeColumns();
-
-  // Create a fast lookup map for results
-  // Key: `${dateStr}_${minutesSinceMidnight}`
-  const resultMap = new Map<string, ResultRecord>();
-
-  // Map market id to its time in minutes
-  const marketTimeMap = new Map<string, number>();
-  for (const m of markets) {
-    marketTimeMap.set(String(m.id), timeStringToMinutes(m.open_time));
-  }
-
-  for (const r of results) {
-    const minutes = marketTimeMap.get(String(r.market_id));
-    if (minutes !== undefined && minutes !== -1) {
-      resultMap.set(`${r.result_date}_${minutes}`, r);
-    }
-  }
+  const resultMap = buildResultMap(markets, results);
 
   const today = new Date();
   const currentExportDateDisplay = `${String(today.getDate()).padStart(2, '0')}/${String(today.getMonth() + 1).padStart(2, '0')}/${today.getFullYear()}`;
@@ -318,12 +364,16 @@ function ChartExportTemplate({
                     </td>
                     {timeCols.map((tc, colIdx) => {
                       const colMinutes = timeStringToMinutes(tc.timeStr);
-                      const result = resultMap.get(`${dateStr}_${colMinutes}`);
+                      const isSundayAfter4 = isSunday && colMinutes > 16 * 60;
+                      const result = isSundayAfter4 ? null : resultMap.get(`${dateStr}_${colMinutes}`);
 
                       let openPana = "";
                       let openDigit = "";
 
-                      if (!blankTemplate && result) {
+                      if (isSundayAfter4 && !blankTemplate) {
+                        openPana = "***";
+                        openDigit = "*";
+                      } else if (!blankTemplate && result) {
                         openPana = result.open_pana || "";
                         openDigit =
                           result.open_digit !== undefined && result.open_digit !== null
@@ -407,19 +457,7 @@ export const downloadChartPDF = async (
     const dates = getChartDateRange(baseDateStr);
     const timeCols = generateTimeColumns();
 
-    // Map market id to its time in minutes
-    const marketTimeMap = new Map<string, number>();
-    for (const m of markets) {
-      marketTimeMap.set(String(m.id), timeStringToMinutes(m.open_time));
-    }
-
-    const resultMap = new Map<string, ResultRecord>();
-    for (const r of results) {
-      const minutes = marketTimeMap.get(String(r.market_id));
-      if (minutes !== undefined && minutes !== -1) {
-        resultMap.set(`${r.result_date}_${minutes}`, r);
-      }
-    }
+    const resultMap = buildResultMap(markets, results);
 
     // Load base template image (the exact panel chart image)
     const img = new Image();
@@ -466,9 +504,19 @@ export const downloadChartPDF = async (
           const colCenterX = (colLeft + colRight) / 2;
 
           const colMinutes = timeStringToMinutes(tc.timeStr);
-          const result = resultMap.get(`${dateStr}_${colMinutes}`);
+          const isSundayAfter4 = isSunday && colMinutes > 16 * 60;
+          const result = isSundayAfter4 ? null : resultMap.get(`${dateStr}_${colMinutes}`);
 
-          if (result && result.open_pana) {
+          if (isSundayAfter4 && !options?.blankTemplate) {
+            ctx.fillStyle = "#000000";
+            // Open Pana (***)
+            ctx.font = "bold 24px Arial, sans-serif";
+            ctx.fillText("***", colCenterX, rowCenterY - 14);
+
+            // Open Digit (*)
+            ctx.font = "bold 28px Arial, sans-serif";
+            ctx.fillText("*", colCenterX, rowCenterY + 16);
+          } else if (result && result.open_pana) {
             ctx.fillStyle = "#000000";
             // Open Pana (3 digits)
             ctx.font = "bold 24px Arial, sans-serif";
