@@ -1,9 +1,8 @@
 import React from "react";
 import { Market, ResultRecord } from "@/lib/mockApi";
-import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
-import { createRoot } from "react-dom/client";
 import { Download } from "lucide-react";
+import templateImgUrl from "@/assets/panelchartpdf_page1.png";
 
 const getChartDateRange = (baseDateStr: string) => {
   const baseDate = new Date(baseDateStr);
@@ -384,72 +383,125 @@ function ChartExportTemplate({
   );
 }
 
+
+// Coordinates extracted with sub-pixel accuracy from panelchartpdf.pdf (2481 x 1754 image)
+const X_CELL_LINES = [
+  120.5, 184.7, 248.8, 313.0, 377.2, 441.3, 505.5, 569.6, 633.8, 697.9,
+  762.1, 826.2, 890.4, 954.5, 1018.7, 1082.8, 1147.0, 1211.2, 1275.3, 1339.5,
+  1403.6, 1467.8, 1531.9, 1596.1, 1660.2, 1724.4, 1788.5, 1852.7, 1916.8, 1981.0,
+  2045.2, 2109.3, 2173.5, 2236.7, 2305.2, 2371.1, 2433.0
+];
+
+const Y_ROW_LINES = [
+  446.4, 535.8, 625.1, 714.5, 803.9, 893.3, 982.7, 1072.0, 1161.4, 1250.8,
+  1340.2, 1429.5, 1518.9, 1608.3, 1699.9
+];
+
 export const downloadChartPDF = async (
   baseDateStr: string,
   markets: Market[],
   results: ResultRecord[],
   options?: { blankTemplate?: boolean; onComplete?: () => void }
 ) => {
-  // Create a hidden container
-  const container = document.createElement("div");
-  container.style.position = "absolute";
-  container.style.top = "-9999px";
-  container.style.left = "-9999px";
-  document.body.appendChild(container);
+  try {
+    const dates = getChartDateRange(baseDateStr);
+    const timeCols = generateTimeColumns();
 
-  const root = createRoot(container);
-
-  root.render(
-    <ChartExportTemplate
-      baseDateStr={baseDateStr}
-      markets={markets}
-      results={results}
-      blankTemplate={options?.blankTemplate}
-    />
-  );
-
-  // Wait for fonts and DOM rendering
-  setTimeout(async () => {
-    try {
-      if (document.fonts) {
-        await document.fonts.ready;
-      }
-
-      const element = document.getElementById("chart-export-container");
-      if (!element) throw new Error("Chart container not found");
-
-      const canvas = await html2canvas(element, {
-        scale: 2.5, // High-resolution print quality
-        useCORS: true,
-        backgroundColor: "#ffffff",
-        width: 1414,
-        height: 1000,
-        logging: false,
-      });
-
-      const imgData = canvas.toDataURL("image/png");
-      const pdf = new jsPDF({
-        orientation: "landscape",
-        unit: "mm",
-        format: "a4",
-      });
-
-      // A4 landscape is 297 x 210 mm
-      pdf.addImage(imgData, "PNG", 0, 0, 297, 210);
-      const filename = options?.blankTemplate
-        ? "kalyan36-panel-chart-blank.pdf"
-        : "kalyan36-panel-chart.pdf";
-      pdf.save(filename);
-    } catch (err) {
-      console.error("Failed to generate PDF", err);
-    } finally {
-      root.unmount();
-      if (container.parentNode) {
-        container.parentNode.removeChild(container);
-      }
-      if (options?.onComplete) options.onComplete();
+    // Map market id to its time in minutes
+    const marketTimeMap = new Map<string, number>();
+    for (const m of markets) {
+      marketTimeMap.set(String(m.id), timeStringToMinutes(m.open_time));
     }
-  }, 500);
+
+    const resultMap = new Map<string, ResultRecord>();
+    for (const r of results) {
+      const minutes = marketTimeMap.get(String(r.market_id));
+      if (minutes !== undefined && minutes !== -1) {
+        resultMap.set(`${r.result_date}_${minutes}`, r);
+      }
+    }
+
+    // Load base template image (the exact panel chart image)
+    const img = new Image();
+    img.crossOrigin = "anonymous";
+    await new Promise<void>((resolve, reject) => {
+      img.onload = () => resolve();
+      img.onerror = (e) => reject(e);
+      img.src = templateImgUrl;
+    });
+
+    const canvas = document.createElement("canvas");
+    canvas.width = 2481;
+    canvas.height = 1754;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) throw new Error("Could not get 2D canvas context");
+
+    // 1. Draw the pristine template image (guaranteeing exact layout, borders, and fonts as image)
+    ctx.drawImage(img, 0, 0, 2481, 1754);
+
+    // 2. If not a blank template, draw dates and results into each corresponding cell
+    if (!options?.blankTemplate) {
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+
+      dates.forEach((d, rowIdx) => {
+        if (rowIdx >= 14) return;
+        const rowTop = Y_ROW_LINES[rowIdx];
+        const rowBottom = Y_ROW_LINES[rowIdx + 1];
+        const rowCenterY = (rowTop + rowBottom) / 2;
+        const dateStr = formatDateLocal(d);
+        const isSunday = d.getDay() === 0;
+
+        // Draw date in Date column (centered between X=42.4 and X=120.5, center is X=81.5)
+        ctx.fillStyle = isSunday ? "#c00000" : "#000000";
+        ctx.font = "bold 20px Arial, sans-serif";
+        ctx.fillText(formatDisplayDate(d), 81.5, rowCenterY - 14);
+        ctx.fillText(String(d.getFullYear()), 81.5, rowCenterY + 14);
+
+        // Draw results for each time column
+        timeCols.forEach((tc, colIdx) => {
+          if (colIdx >= 36) return;
+          const colLeft = X_CELL_LINES[colIdx];
+          const colRight = X_CELL_LINES[colIdx + 1];
+          const colCenterX = (colLeft + colRight) / 2;
+
+          const colMinutes = timeStringToMinutes(tc.timeStr);
+          const result = resultMap.get(`${dateStr}_${colMinutes}`);
+
+          if (result && result.open_pana) {
+            ctx.fillStyle = "#000000";
+            // Open Pana (3 digits)
+            ctx.font = "bold 24px Arial, sans-serif";
+            ctx.fillText(result.open_pana, colCenterX, rowCenterY - 14);
+
+            // Open Digit (1 digit)
+            if (result.open_digit !== undefined && result.open_digit !== null) {
+              ctx.font = "bold 28px Arial, sans-serif";
+              ctx.fillText(String(result.open_digit), colCenterX, rowCenterY + 16);
+            }
+          }
+        });
+      });
+    }
+
+    const imgData = canvas.toDataURL("image/png");
+    const pdf = new jsPDF({
+      orientation: "landscape",
+      unit: "mm",
+      format: "a4",
+    });
+
+    // A4 landscape is 297 x 210 mm
+    pdf.addImage(imgData, "PNG", 0, 0, 297, 210);
+    const filename = options?.blankTemplate
+      ? "kalyan36-panel-chart-blank.pdf"
+      : "kalyan36-panel-chart.pdf";
+    pdf.save(filename);
+  } catch (err) {
+    console.error("Failed to generate PDF", err);
+  } finally {
+    if (options?.onComplete) options.onComplete();
+  }
 };
 
 export function ExportChartButton({
@@ -462,62 +514,42 @@ export function ExportChartButton({
   results: ResultRecord[];
 }) {
   const [isExporting, setIsExporting] = React.useState(false);
-  const [isBlankExporting, setIsBlankExporting] = React.useState(false);
 
-  const handleExport = async (blank: boolean = false) => {
-    if (blank) {
-      setIsBlankExporting(true);
-    } else {
-      setIsExporting(true);
-    }
+  const handleExport = async () => {
+    setIsExporting(true);
 
     let finalMarkets = markets;
     let finalResults = results;
 
-    if (!blank) {
-      // Fetch fresh data from backend
-      try {
-        const res = await fetch("http://localhost:8000/api/get_pdf_results");
-        if (res.ok) {
-          const data = await res.json();
-          if (data.status === "success" && data.markets && data.results) {
-            finalMarkets = data.markets;
-            finalResults = data.results;
-          }
+    // Fetch fresh data from backend
+    try {
+      const res = await fetch("http://localhost:8000/api/get_pdf_results");
+      if (res.ok) {
+        const data = await res.json();
+        if (data.status === "success" && data.markets && data.results) {
+          finalMarkets = data.markets;
+          finalResults = data.results;
         }
-      } catch (err) {
-        console.warn("Failed to fetch from FastAPI endpoint, falling back to React state", err);
       }
+    } catch (err) {
+      console.warn("Failed to fetch from FastAPI endpoint, falling back to React state", err);
     }
 
     downloadChartPDF(date, finalMarkets, finalResults, {
-      blankTemplate: blank,
       onComplete: () => {
         setIsExporting(false);
-        setIsBlankExporting(false);
       },
     });
   };
 
   return (
-    <div className="flex items-center gap-2">
-      <button
-        onClick={() => handleExport(false)}
-        disabled={isExporting || isBlankExporting}
-        className="btn-primary"
-      >
-        <Download className="mr-2 h-4 w-4" />
-        {isExporting ? "Exporting..." : "Export Chart PDF"}
-      </button>
-      <button
-        onClick={() => handleExport(true)}
-        disabled={isExporting || isBlankExporting}
-        className="btn-secondary"
-        title="Download blank chart template identical to panelchartpdf.pdf"
-      >
-        <Download className="mr-2 h-4 w-4" />
-        {isBlankExporting ? "Exporting..." : "Blank Chart PDF"}
-      </button>
-    </div>
+    <button
+      onClick={handleExport}
+      disabled={isExporting}
+      className="btn-primary"
+    >
+      <Download className="mr-2 h-4 w-4" />
+      {isExporting ? "Exporting..." : "Export Chart PDF"}
+    </button>
   );
 }
