@@ -494,6 +494,35 @@ export const downloadChartPDF = async (
     // 1. Draw the pristine template image (guaranteeing exact layout, borders, and fonts as image)
     ctx.drawImage(img, 0, 0, 2481, 1754);
 
+    // Redraw table headers: "Date" in brown, and all 36 Time headers in RED
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+
+    // 1. "Date" column header (centered at X=81.5)
+    ctx.fillStyle = "#ffffff";
+    ctx.fillRect(44, 359, 75, 85);
+    ctx.fillStyle = "#8B4513";
+    ctx.font = "bold 22px Arial, sans-serif";
+    ctx.fillText("Date", 81.5, 401.7);
+
+    // 2. All 36 Time column headers in bold RED
+    timeCols.forEach((tc, colIdx) => {
+      if (colIdx >= 36) return;
+      const colLeft = X_CELL_LINES[colIdx];
+      const colRight = X_CELL_LINES[colIdx + 1];
+      const colCenterX = (colLeft + colRight) / 2;
+
+      // Clear cell interior while preserving borders
+      ctx.fillStyle = "#ffffff";
+      ctx.fillRect(colLeft + 1.5, 359, colRight - colLeft - 3, 85);
+
+      // Draw time in bold red
+      ctx.fillStyle = "#d00000";
+      ctx.font = "bold 20px Arial, sans-serif";
+      ctx.fillText(tc.displayTop, colCenterX, 386);
+      ctx.fillText(tc.displayBottom, colCenterX, 416);
+    });
+
     // 2. If not a blank template, draw header Monday date next to दिनांक :
     if (!options?.blankTemplate) {
       if (mondayDateDisplay) {
