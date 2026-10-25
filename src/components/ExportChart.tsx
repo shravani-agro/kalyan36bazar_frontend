@@ -156,8 +156,10 @@ function ChartExportTemplate({
   const timeCols = generateTimeColumns();
   const resultMap = buildResultMap(markets, results);
 
-  const today = new Date();
-  const currentExportDateDisplay = `${String(today.getDate()).padStart(2, '0')}/${String(today.getMonth() + 1).padStart(2, '0')}/${today.getFullYear()}`;
+  const mondayDate = dates[0];
+  const mondayDateDisplay = mondayDate
+    ? `${String(mondayDate.getDate()).padStart(2, "0")}/${String(mondayDate.getMonth() + 1).padStart(2, "0")}/${mondayDate.getFullYear()}`
+    : "";
 
   return (
     <div
@@ -220,11 +222,11 @@ function ChartExportTemplate({
                 fontFamily: "'Noto Sans Devanagari', 'Akruti', 'Mangal', sans-serif",
                 fontSize: "28px",
                 fontWeight: "800",
-                color: "#000000",
+                color: "#8B4513",
                 lineHeight: "1.1",
               }}
             >
-              दिनांक : {blankTemplate ? "" : currentExportDateDisplay}
+              दिनांक : {blankTemplate ? "" : mondayDateDisplay}
             </div>
           </div>
 
@@ -304,7 +306,7 @@ function ChartExportTemplate({
                     fontSize: "13px",
                     fontWeight: "bold",
                     fontFamily: "Arial, sans-serif",
-                    color: "#000000",
+                    color: "#8B4513",
                     backgroundColor: "#ffffff",
                     verticalAlign: "middle",
                     textAlign: "center",
@@ -322,7 +324,7 @@ function ChartExportTemplate({
                       fontWeight: "bold",
                       fontFamily: "Arial, sans-serif",
                       textAlign: "center",
-                      color: "#000000",
+                      color: "#d00000",
                       backgroundColor: "#ffffff",
                       lineHeight: "1.15",
                       verticalAlign: "middle",
@@ -339,6 +341,16 @@ function ChartExportTemplate({
                 const dateStr = formatDateLocal(d);
                 const isSunday = d.getDay() === 0;
 
+                const now = new Date();
+                const nowIST = new Date(now.toLocaleString("en-US", { timeZone: "Asia/Kolkata" }));
+                const todayStr = new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Kolkata" }).format(now);
+                const isTodayPassed4PM =
+                  nowIST.getHours() > 16 || (nowIST.getHours() === 16 && nowIST.getMinutes() >= 0);
+
+                // Sunday after 4 PM cutoff applies ONLY to today (if >= 4 PM) or past Sundays, NEVER in advance for future Sundays
+                const isSundayCutoffReached =
+                  isSunday && (dateStr < todayStr || (dateStr === todayStr && isTodayPassed4PM));
+
                 return (
                   <tr key={rowIdx}>
                     <td
@@ -347,7 +359,7 @@ function ChartExportTemplate({
                         textAlign: "center",
                         verticalAlign: "middle",
                         padding: "2px 0",
-                        color: isSunday ? "#d00000" : "#000000",
+                        color: isSunday ? "#d00000" : "#8B4513",
                         lineHeight: "1.15",
                         fontSize: "11px",
                         fontWeight: "bold",
@@ -364,7 +376,7 @@ function ChartExportTemplate({
                     </td>
                     {timeCols.map((tc, colIdx) => {
                       const colMinutes = timeStringToMinutes(tc.timeStr);
-                      const isSundayAfter4 = isSunday && colMinutes > 16 * 60;
+                      const isSundayAfter4 = isSundayCutoffReached && colMinutes > 16 * 60;
                       const result = isSundayAfter4 ? null : resultMap.get(`${dateStr}_${colMinutes}`);
 
                       let openPana = "";
@@ -459,6 +471,11 @@ export const downloadChartPDF = async (
 
     const resultMap = buildResultMap(markets, results);
 
+    const mondayDate = dates[0];
+    const mondayDateDisplay = mondayDate
+      ? `${String(mondayDate.getDate()).padStart(2, "0")}/${String(mondayDate.getMonth() + 1).padStart(2, "0")}/${mondayDate.getFullYear()}`
+      : "";
+
     // Load base template image (the exact panel chart image)
     const img = new Image();
     img.crossOrigin = "anonymous";
@@ -477,10 +494,24 @@ export const downloadChartPDF = async (
     // 1. Draw the pristine template image (guaranteeing exact layout, borders, and fonts as image)
     ctx.drawImage(img, 0, 0, 2481, 1754);
 
-    // 2. If not a blank template, draw dates and results into each corresponding cell
+    // 2. If not a blank template, draw header Monday date next to दिनांक :
     if (!options?.blankTemplate) {
+      if (mondayDateDisplay) {
+        ctx.textAlign = "left";
+        ctx.textBaseline = "middle";
+        ctx.fillStyle = "#8B4513";
+        ctx.font = "bold 52px Arial, sans-serif";
+        ctx.fillText(mondayDateDisplay, 315, 285);
+      }
+
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
+
+      const now = new Date();
+      const nowIST = new Date(now.toLocaleString("en-US", { timeZone: "Asia/Kolkata" }));
+      const todayStr = new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Kolkata" }).format(now);
+      const isTodayPassed4PM =
+        nowIST.getHours() > 16 || (nowIST.getHours() === 16 && nowIST.getMinutes() >= 0);
 
       dates.forEach((d, rowIdx) => {
         if (rowIdx >= 14) return;
@@ -490,8 +521,12 @@ export const downloadChartPDF = async (
         const dateStr = formatDateLocal(d);
         const isSunday = d.getDay() === 0;
 
+        // Sunday after 4 PM cutoff applies ONLY to today (if >= 4 PM) or past Sundays, NEVER in advance for future Sundays
+        const isSundayCutoffReached =
+          isSunday && (dateStr < todayStr || (dateStr === todayStr && isTodayPassed4PM));
+
         // Draw date in Date column (centered between X=42.4 and X=120.5, center is X=81.5)
-        ctx.fillStyle = isSunday ? "#c00000" : "#000000";
+        ctx.fillStyle = isSunday ? "#c00000" : "#8B4513";
         ctx.font = "bold 20px Arial, sans-serif";
         ctx.fillText(formatDisplayDate(d), 81.5, rowCenterY - 14);
         ctx.fillText(String(d.getFullYear()), 81.5, rowCenterY + 14);
@@ -504,7 +539,7 @@ export const downloadChartPDF = async (
           const colCenterX = (colLeft + colRight) / 2;
 
           const colMinutes = timeStringToMinutes(tc.timeStr);
-          const isSundayAfter4 = isSunday && colMinutes > 16 * 60;
+          const isSundayAfter4 = isSundayCutoffReached && colMinutes > 16 * 60;
           const result = isSundayAfter4 ? null : resultMap.get(`${dateStr}_${colMinutes}`);
 
           if (isSundayAfter4 && !options?.blankTemplate) {
