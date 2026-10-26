@@ -1,9 +1,10 @@
-import { ReactNode, useState, useMemo } from "react";
-import { Users, ClipboardList, Coins, CircleDollarSign, Wallet, Landmark, UserPlus, Plus, ListFilter } from "lucide-react";
+import React, { ReactNode, useState, useEffect, useMemo } from "react";
+import { Users, ClipboardList, Coins, CircleDollarSign, Wallet, Landmark, UserPlus, Plus, ListFilter, Upload, ShieldCheck, Sparkles, CheckCircle2 } from "lucide-react";
 import { AppUser, Bid, WinHistory, Market, MarketRecord, BalanceTransaction, ActivityLog, ResultRecord } from "@/lib/mockApi";
-import { ExportChartButton } from "../ExportChart";
+import { ExportChartButton, RsbossToggle, getTakeRsbossResult } from "../ExportChart";
 import { toast } from "sonner";
 import { money, Panel, DataTable, RowActions, Badge, formatDate, formatDateTime, getToday, SimpleList } from "../ui/AdminUI";
+import rsbossResults from "@/data/rsboss_results.json";
 
 
 
@@ -57,9 +58,9 @@ export function Distribution({ counts }: { counts: { label: string; count: numbe
 }
 
 export function Dashboard({
-  users, bids, wins, markets, results, analytics, setSection, filters, updateFilter
+  users, bids, wins, markets, results = [], analytics, setSection, filters, updateFilter
 }: {
-  users: AppUser[]; bids: Bid[]; wins: WinHistory[]; markets: Market[]; results: ResultRecord[];
+  users: AppUser[]; bids: Bid[]; wins: WinHistory[]; markets: Market[]; results?: ResultRecord[];
   analytics: any; setSection: (s: any) => void; filters: any; updateFilter: (k: any, v: any) => void
 }) {
   const cards = [
@@ -85,7 +86,8 @@ export function Dashboard({
         ))}
       </div>
 
-      <div className="flex justify-end mb-4">
+      <div className="flex flex-wrap items-center justify-end gap-3 mb-4">
+        <RsbossToggle />
         <ExportChartButton date={filters.date || getToday()} markets={markets} results={results} />
       </div>
 
@@ -162,34 +164,93 @@ export function MarketsModule({ items, onCreate, onEdit, onDelete }: { items: Ma
 }
 
 export function ResultsModule({
-  items,
+  items = [],
   marketById,
   filters,
   updateFilter,
   onCreate,
   onEdit,
   onDelete,
+  onBulkUpload,
   canAdd = true,
   canUpdate = true,
   canDelete = true
 }: {
-  items: any[];
+  items?: any[];
   marketById: Map<string, Market>;
   filters: any;
   updateFilter: (k: string, v: string) => void;
   onCreate: () => void;
   onEdit: (item: any) => void;
   onDelete: (id: string) => void;
+  onBulkUpload?: () => void;
   canAdd?: boolean;
   canUpdate?: boolean;
   canDelete?: boolean;
 }) {
+  const [showBackup, setShowBackup] = useState(false);
+  const [takeRsboss, setTakeRsboss] = useState(getTakeRsbossResult());
+  const targetDate = filters?.date || getToday();
+
+  // Listen to toggle events
+  useEffect(() => {
+    const handler = () => setTakeRsboss(getTakeRsbossResult());
+    window.addEventListener("rsboss_setting_changed", handler);
+    return () => window.removeEventListener("rsboss_setting_changed", handler);
+  }, []);
+
+  // Find RSBOSS backup records for this date
+  const dateBackupRecords = useMemo(() => {
+    if (!Array.isArray(rsbossResults)) return [];
+    return (rsbossResults as any[]).filter(item => item.result_date === targetDate);
+  }, [targetDate]);
+
   return (
     <Panel
-      title="Results"
-      action={canAdd && <button className="btn-primary" onClick={onCreate}><Plus className="h-4 w-4" /> Create Result</button>}
+      title="Results Management"
+      action={
+        <div className="flex flex-wrap items-center gap-2">
+          <RsbossToggle />
+          {canAdd && onBulkUpload && (
+            <button
+              className="btn-compact border border-primary text-primary hover:bg-primary/10 flex items-center gap-1.5 px-3 py-1.5 rounded-md font-semibold text-xs"
+              onClick={onBulkUpload}
+            >
+              <Upload className="h-4 w-4" /> Bulk Result Upload
+            </button>
+          )}
+          {canAdd && (
+            <button className="btn-primary flex items-center gap-1 text-xs px-3 py-1.5" onClick={onCreate}>
+              <Plus className="h-4 w-4" /> Create Single Result
+            </button>
+          )}
+        </div>
+      }
     >
-      <div className="mb-6 flex items-end gap-4">
+      {/* Priority Indicator Alert */}
+      <div className="mb-4 bg-primary/10 border border-primary/25 rounded-lg p-3 text-xs sm:text-sm flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-foreground">
+        <div className="flex items-center gap-2">
+          <ShieldCheck className="h-5 w-5 text-primary shrink-0" />
+          <div>
+            <span className="font-bold text-primary">System Result Priority:</span> Manual result upload is actively prioritized. Taking results from RSBOSS is currently{" "}
+            <span className={`font-bold px-1.5 py-0.5 rounded text-xs ${takeRsboss ? "bg-amber-500/20 text-amber-700 dark:text-amber-300" : "bg-muted text-muted-foreground"}`}>
+              {takeRsboss ? "ENABLED (as backup for empty slots)" : "DISABLED (manual results only)"}
+            </span>.
+          </div>
+        </div>
+        {takeRsboss && dateBackupRecords.length > 0 && (
+          <button
+            type="button"
+            onClick={() => setShowBackup(!showBackup)}
+            className="btn-compact border border-amber-500/40 text-amber-600 dark:text-amber-400 hover:bg-amber-500/10 text-xs shrink-0 flex items-center gap-1 font-medium"
+          >
+            <Sparkles className="h-3 w-3" />
+            {showBackup ? "Hide RSBOSS Backup" : `View RSBOSS Backup (${dateBackupRecords.length})`}
+          </button>
+        )}
+      </div>
+
+      <div className="mb-6 flex flex-wrap items-end gap-4">
         <label className="field-label max-w-[200px]">
           Filter by Date
           <input
@@ -199,35 +260,107 @@ export function ResultsModule({
             onChange={(e) => updateFilter("date", e.target.value)}
           />
         </label>
+        <div className="text-xs text-muted-foreground pb-2">
+          Showing <strong>{items.length}</strong> official manual results for {targetDate}.
+        </div>
       </div>
 
-      <DataTable headers={["Date", "Market", "Open Pana", "Open Digit", "Created", (canUpdate || canDelete) ? "Actions" : ""]}>
+      <DataTable headers={["Date", "Market", "Scheduled Time", "Open Pana", "Open Digit", "Source / Priority", (canUpdate || canDelete) ? "Actions" : ""]}>
         {items.length > 0 ? (
-          items.map((item) => (
-            <tr key={item.id}>
-              <td>{formatDate(item.result_date)}</td>
-              <td className="font-medium">{marketById.get(item.market_id)?.market_name || "—"}</td>
-              <td>{item.open_pana}</td>
-              <td>{item.open_digit}</td>
-              <td>{formatDateTime(item.created_at)}</td>
-              <td>
-                {(canUpdate || canDelete) && (
-                  <RowActions
-                    onEdit={canUpdate ? () => onEdit(item) : undefined}
-                    onDelete={canDelete ? () => onDelete(item.id) : undefined}
-                  />
-                )}
-              </td>
-            </tr>
-          ))
+          items.map((item) => {
+            const market = marketById ? (marketById.get(item.market_id) || marketById.get(String(item.market_id)) || (marketById as any).get(Number(item.market_id))) : undefined;
+            return (
+              <tr key={item.id} className="hover:bg-muted/30">
+                <td>{formatDate(item.result_date)}</td>
+                <td className="font-semibold text-primary">{market?.market_name || "—"}</td>
+                <td className="font-mono text-xs">{market?.open_time || "—"}</td>
+                <td className="font-mono font-bold text-base">{item.open_pana}</td>
+                <td>
+                  <span className="inline-block w-6 h-6 rounded-full bg-primary/20 text-primary font-bold text-center leading-6 text-sm">
+                    {item.open_digit}
+                  </span>
+                </td>
+                <td>
+                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-semibold bg-green-500/10 text-green-600 dark:text-green-400 border border-green-500/30">
+                    <CheckCircle2 className="h-3 w-3" /> Manual Upload (Priority 1)
+                  </span>
+                </td>
+                <td>
+                  {(canUpdate || canDelete) && (
+                    <RowActions
+                      onEdit={canUpdate ? () => onEdit(item) : undefined}
+                      onDelete={canDelete ? () => onDelete(item.id) : undefined}
+                    />
+                  )}
+                </td>
+              </tr>
+            );
+          })
         ) : (
           <tr>
-            <td colSpan={6} className="text-center py-8 text-muted-foreground">
-              No results found for {filters.date || "today"}.
+            <td colSpan={7} className="text-center py-8 text-muted-foreground">
+              No manual results uploaded for {filters.date || "today"}.
+              {canAdd && onBulkUpload && (
+                <div className="mt-3">
+                  <button onClick={onBulkUpload} className="btn-primary text-xs inline-flex items-center gap-1">
+                    <Upload className="h-3.5 w-3.5" /> Upload Manual Results for this date
+                  </button>
+                </div>
+              )}
             </td>
           </tr>
         )}
       </DataTable>
+
+      {/* RSBOSS Backup View Drawer/Table */}
+      {showBackup && (
+        <div className="mt-8 border-t border-border pt-6">
+          <div className="flex items-center justify-between mb-3">
+            <h4 className="text-sm font-bold text-amber-600 dark:text-amber-400 flex items-center gap-2">
+              <Sparkles className="h-4 w-4" /> RSBOSS Backup Records for {targetDate} (Secondary Fallback Only)
+            </h4>
+            <span className="text-xs text-muted-foreground">
+              These values are only used as fallback when no manual result is declared.
+            </span>
+          </div>
+
+          <div className="overflow-x-auto border border-amber-500/30 rounded-lg bg-amber-500/5">
+            <table className="w-full text-xs text-left">
+              <thead className="bg-amber-500/10 border-b border-amber-500/20 text-muted-foreground font-semibold">
+                <tr>
+                  <th className="p-2">Date</th>
+                  <th className="p-2">Slot Time</th>
+                  <th className="p-2">Backup Pana</th>
+                  <th className="p-2">Backup Digit</th>
+                  <th className="p-2">Result</th>
+                  <th className="p-2 text-right">Action</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-amber-500/20 font-mono">
+                {dateBackupRecords.map((rec: any, idx: number) => (
+                  <tr key={idx} className="hover:bg-amber-500/10">
+                    <td className="p-2">{rec.result_date}</td>
+                    <td className="p-2">{rec.time}</td>
+                    <td className="p-2 font-bold">{rec.open_pana}</td>
+                    <td className="p-2 font-bold">{rec.open_digit}</td>
+                    <td className="p-2">{rec.result || `${rec.open_pana}-${rec.open_digit}`}</td>
+                    <td className="p-2 text-right font-sans">
+                      {canAdd && (
+                        <button
+                          onClick={onBulkUpload}
+                          className="btn-compact border border-amber-500/40 text-amber-600 dark:text-amber-400 hover:bg-amber-500/20 text-[11px]"
+                        >
+                          Upload as Manual
+                        </button>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
     </Panel>
   );
 }
@@ -675,7 +808,7 @@ export function SubAdminOverviewModule({
   bids,
   wins,
   markets,
-  results,
+  results = [],
   filters,
   updateFilter,
   assignedUserIds
@@ -684,12 +817,12 @@ export function SubAdminOverviewModule({
   bids: Bid[];
   wins: WinHistory[];
   markets: Market[];
-  results: ResultRecord[];
+  results?: ResultRecord[];
   filters: any;
   updateFilter: (k: string, v: string) => void;
   assignedUserIds?: string[];
 }) {
-  const selectedDate = filters.date || getToday();
+  const selectedDate = filters?.date || getToday();
   const selectedMarketId = filters.marketId || "all";
 
   const userStats = useMemo(() => {
@@ -752,7 +885,8 @@ export function SubAdminOverviewModule({
           </label>
         </div>
       </Panel>
-      <div className="flex justify-end mb-4">
+      <div className="flex flex-wrap items-center justify-end gap-3 mb-4">
+        <RsbossToggle />
         <ExportChartButton date={selectedDate} markets={markets} results={results} />
       </div>
 

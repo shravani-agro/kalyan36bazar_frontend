@@ -4,6 +4,8 @@ import jsPDF from "jspdf";
 import { Download } from "lucide-react";
 import templateImgUrl from "@/assets/panelchartpdf_page1.png";
 import rsbossResults from "@/data/rsboss_results.json";
+import { realApi } from "@/lib/api";
+import { toast } from "sonner";
 
 const getChartDateRange = (baseDateStr: string) => {
   const baseDate = new Date(baseDateStr);
@@ -105,36 +107,59 @@ function timeStringToMinutes(timeStr: string): number {
   return h * 60 + m;
 }
 
-function buildResultMap(markets: Market[], results: ResultRecord[]): Map<string, ResultRecord> {
+export function getTakeRsbossResult(): boolean {
+  if (typeof window === "undefined") return true;
+  return localStorage.getItem("take_rsboss_results") !== "false";
+}
+
+export function setTakeRsbossResult(val: boolean) {
+  if (typeof window === "undefined") return;
+  localStorage.setItem("take_rsboss_results", val ? "true" : "false");
+  window.dispatchEvent(new Event("rsboss_setting_changed"));
+}
+
+export function buildResultMap(
+  markets: Market[],
+  results: ResultRecord[],
+  includeRsbossBackup: boolean = getTakeRsbossResult()
+): Map<string, ResultRecord> {
   const resultMap = new Map<string, ResultRecord>();
 
-  // 1. First populate with RSBOSS authentic historical results
-  if (Array.isArray(rsbossResults)) {
-    for (const item of (rsbossResults as any[])) {
-      const min = timeStringToMinutes(item.time);
-      if (min !== -1) {
-        resultMap.set(`${item.result_date}_${min}`, {
-          id: `rsboss_${item.result_date}_${min}`,
-          result_date: item.result_date,
-          market_id: "",
-          open_pana: item.open_pana,
-          open_digit: item.open_digit,
-          created_at: item.result_date,
-        });
-      }
+  // Map market ID to slot time (in minutes from midnight)
+  const marketTimeMap = new Map<string, number>();
+  for (const m of markets) {
+    const mins = timeStringToMinutes(m.open_time);
+    if (mins !== -1) {
+      marketTimeMap.set(String(m.id), mins);
     }
   }
 
-  // 2. Overlay live results from database (if any)
-  const marketTimeMap = new Map<string, number>();
-  for (const m of markets) {
-    marketTimeMap.set(String(m.id), timeStringToMinutes(m.open_time));
-  }
-
+  // 1. PRIMARY PRIORITY: Populate manually uploaded / declared results from database
+  // Manual results ALWAYS take absolute precedence over backup scrapers/rsboss.
   for (const r of results) {
     const minutes = marketTimeMap.get(String(r.market_id));
     if (minutes !== undefined && minutes !== -1) {
       resultMap.set(`${r.result_date}_${minutes}`, r);
+    }
+  }
+
+  // 2. BACKUP ONLY: RSBOSS results populate slots ONLY IF take_rsboss is enabled AND slot is empty
+  if (includeRsbossBackup && Array.isArray(rsbossResults)) {
+    for (const item of (rsbossResults as any[])) {
+      const min = timeStringToMinutes(item.time);
+      if (min !== -1) {
+        const slotKey = `${item.result_date}_${min}`;
+        if (!resultMap.has(slotKey)) {
+          resultMap.set(slotKey, {
+            id: `rsboss_${item.result_date}_${min}`,
+            result_date: item.result_date,
+            market_id: "",
+            open_pana: item.open_pana,
+            open_digit: item.open_digit,
+            created_at: item.result_date,
+          });
+        }
+      }
     }
   }
 
@@ -463,13 +488,14 @@ export const downloadChartPDF = async (
   baseDateStr: string,
   markets: Market[],
   results: ResultRecord[],
-  options?: { blankTemplate?: boolean; onComplete?: () => void }
+  options?: { blankTemplate?: boolean; onComplete?: () => void; includeRsbossBackup?: boolean }
 ) => {
   try {
+    const includeRsboss = options?.includeRsbossBackup ?? getTakeRsbossResult();
     const dates = getChartDateRange(baseDateStr);
     const timeCols = generateTimeColumns();
 
-    const resultMap = buildResultMap(markets, results);
+    const resultMap = buildResultMap(markets, results, includeRsboss);
 
     const mondayDate = dates[0];
     const mondayDateDisplay = mondayDate
@@ -626,6 +652,13 @@ export function ExportChartButton({
   results: ResultRecord[];
 }) {
   const [isExporting, setIsExporting] = React.useState(false);
+  const [takeRsboss, setTakeRsboss] = React.useState(getTakeRsbossResult());
+
+  React.useEffect(() => {
+    const handler = () => setTakeRsboss(getTakeRsbossResult());
+    window.addEventListener("rsboss_setting_changed", handler);
+    return () => window.removeEventListener("rsboss_setting_changed", handler);
+  }, []);
 
   const handleExport = async () => {
     setIsExporting(true);
@@ -633,21 +666,27 @@ export function ExportChartButton({
     let finalMarkets = markets;
     let finalResults = results;
 
-    // Fetch fresh data from backend
+    // Fetch fresh manual results & markets from backend
     try {
-      const res = await fetch("http://localhost:8000/api/get_pdf_results");
-      if (res.ok) {
-        const data = await res.json();
-        if (data.status === "success" && data.markets && data.results) {
-          finalMarkets = data.markets;
-          finalResults = data.results;
-        }
+      const { data, error } = await realApi.db.getPdfResults();
+      if (!error && data && data.status === "success" && data.markets && data.results) {
+        finalMarkets = data.markets;
+        finalResults = data.results;
+      } else {
+        // Fallback: fetch directly
+        const [mRes, rRes] = await Promise.all([
+          realApi.db.getMarkets(),
+          realApi.db.getResults("", "all", 2000),
+        ]);
+        if (mRes.data && mRes.data.length > 0) finalMarkets = mRes.data;
+        if (rRes.data && rRes.data.length > 0) finalResults = rRes.data;
       }
     } catch (err) {
-      console.warn("Failed to fetch from FastAPI endpoint, falling back to React state", err);
+      console.warn("Failed to fetch fresh data from backend, falling back to React state", err);
     }
 
     downloadChartPDF(date, finalMarkets, finalResults, {
+      includeRsbossBackup: takeRsboss,
       onComplete: () => {
         setIsExporting(false);
       },
@@ -659,9 +698,58 @@ export function ExportChartButton({
       onClick={handleExport}
       disabled={isExporting}
       className="btn-primary"
+      title={takeRsboss ? "Export Chart PDF (Manual Results + RSBOSS Backup)" : "Export Chart PDF (Manual Results Only)"}
     >
       <Download className="mr-2 h-4 w-4" />
       {isExporting ? "Exporting..." : "Export Chart PDF"}
+    </button>
+  );
+}
+
+export function RsbossToggle({ className }: { className?: string }) {
+  const [takeRsboss, setTakeRsboss] = React.useState(getTakeRsbossResult());
+
+  React.useEffect(() => {
+    const handler = () => setTakeRsboss(getTakeRsbossResult());
+    window.addEventListener("rsboss_setting_changed", handler);
+    return () => window.removeEventListener("rsboss_setting_changed", handler);
+  }, []);
+
+  const toggle = () => {
+    const nextVal = !takeRsboss;
+    setTakeRsbossResult(nextVal);
+    setTakeRsboss(nextVal);
+    if (nextVal) {
+      toast.success("RSBOSS Backup Enabled: Results will be taken from RSBOSS for unentered slots.");
+    } else {
+      toast.info("RSBOSS Backup Disabled: Strictly taking manual result uploads only.");
+    }
+  };
+
+  return (
+    <button
+      type="button"
+      onClick={toggle}
+      className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all border shadow-sm ${
+        takeRsboss
+          ? "bg-amber-500/10 border-amber-500/40 text-amber-700 dark:text-amber-300 hover:bg-amber-500/20"
+          : "bg-muted/70 border-border text-muted-foreground hover:bg-muted"
+      } ${className || ""}`}
+      title="Toggle whether to take backup results from RSBOSS or use manual results only"
+    >
+      <span
+        className={`w-2.5 h-2.5 rounded-full transition-colors ${
+          takeRsboss ? "bg-amber-500 ring-2 ring-amber-500/30" : "bg-muted-foreground/40"
+        }`}
+      />
+      <span className="font-medium">Take from RSBOSS:</span>
+      <span
+        className={`font-bold uppercase tracking-wider ${
+          takeRsboss ? "text-amber-600 dark:text-amber-400" : "text-muted-foreground"
+        }`}
+      >
+        {takeRsboss ? "ON (Take Backup)" : "OFF (Manual Only)"}
+      </span>
     </button>
   );
 }

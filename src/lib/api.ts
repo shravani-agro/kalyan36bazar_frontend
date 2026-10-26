@@ -96,12 +96,29 @@ export const realApi = {
         return { data: null, error: err.response?.data || { message: err.message } };
       }
     },
-    getResults: async (resultDate?: string, marketId?: string) => {
+    getResults: async (resultDate?: string, marketId?: string, limit?: number) => {
       try {
         const params: any = {};
         if (resultDate) params.result_date = resultDate;
         if (marketId && marketId !== "all") params.market_id = marketId;
+        if (limit) params.limit = limit;
         const res = await api.get("/api/results", { params });
+        return { data: res.data, error: null };
+      } catch (err: any) {
+        return { data: null, error: err.response?.data || { message: err.message } };
+      }
+    },
+    getPdfResults: async () => {
+      try {
+        const res = await api.get("/api/get_pdf_results");
+        return { data: res.data, error: null };
+      } catch (err: any) {
+        return { data: null, error: err.response?.data || { message: err.message } };
+      }
+    },
+    declareBulkResults: async (results: any[], allowOverwrite: boolean = true) => {
+      try {
+        const res = await api.post("/api/create/bulk-results", { results, allow_overwrite: allowOverwrite });
         return { data: res.data, error: null };
       } catch (err: any) {
         return { data: null, error: err.response?.data || { message: err.message } };

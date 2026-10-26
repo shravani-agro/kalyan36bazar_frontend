@@ -331,14 +331,16 @@ function App({ isSubAdminPortal = false }: { isSubAdminPortal?: boolean }) {
   }
 
   async function loadDashboardData() {
-    const [bidsRes, txRes, winsRes] = await Promise.all([
+    const [bidsRes, txRes, winsRes, resultsRes] = await Promise.all([
       mockApi.db.getBidsByDate(filters.date, filters.marketId),
       mockApi.db.getBalanceTransactions(),
       mockApi.db.getWinHistory(),
+      mockApi.db.getResults(filters.date, filters.marketId),
     ]);
     if (bidsRes.data) setBids(bidsRes.data);
     if (txRes.data) setTransactions(txRes.data);
     if (winsRes.data) setWins(winsRes.data);
+    if (resultsRes.data) setResults(resultsRes.data);
   }
 
   async function loadAll(showSpinner = true) {
@@ -436,6 +438,7 @@ function App({ isSubAdminPortal = false }: { isSubAdminPortal?: boolean }) {
               onCreate={() => setModal({ kind: "result", mode: "create" })}
               onEdit={(item) => setModal({ kind: "result", mode: "edit", item })}
               onDelete={(id) => remove("results", id, "result")}
+              onBulkUpload={() => setModal({ kind: "bulk_result", mode: "create", defaultDate: filters.date || getToday() })}
               canAdd={(session?.user as any)?.can_add_result !== false}
               canUpdate={(session?.user as any)?.can_update_result !== false}
               canDelete={(session?.user as any)?.can_delete_result !== false}
